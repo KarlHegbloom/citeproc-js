@@ -347,6 +347,9 @@ doh.register("%s.%s", [
         elif self.opt.engine == "jsc":
             engine = cp.get("jsc", "command")
             nick = "jsc"
+        elif self.opt.engine == "guile2":
+            engine = cp.get("guile2", "command")
+            nick = "guile2"
         else:
             engine = cp.get("rhino","command")
             nick = "rhino"
