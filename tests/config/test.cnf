@@ -10,6 +10,9 @@ command: js24
 [rhino]
 command: java -client -jar ./rhino/js-1.7R3.jar -opt 8
 
+[guile2]
+command: guile-2.2 --language=ecmascript 
+
 [validation]
 validator: java -client -jar ./jing/jing-20131210.jar -c
 schema: ./csl-schemata/csl/csl.rnc
