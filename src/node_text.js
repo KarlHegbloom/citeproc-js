@@ -111,6 +111,15 @@ CSL.Node.text = {
                         if (state.registry.registry[Item.id] && state.registry.registry[Item.id].disambig.year_suffix !== false && !state.tmp.just_looking) {
                             //state.output.append(state.registry.registry[Item.id].disambig[2],this);
                             num = parseInt(state.registry.registry[Item.id].disambig.year_suffix, 10);
+
+                            //if (state[state.tmp.area].opt.collapse === "year-suffix-ranged") {
+                            //    //this.range_prefix = "-";
+                            //    this.range_prefix = state.getTerm("citation-range-delimiter");
+                            //}
+                            //this.successor_prefix = state[state.tmp.area].opt.layout_delimiter;
+                            if (state[state.tmp.area].opt.cite_group_delimiter) {
+                                this.successor_prefix = state[state.tmp.area].opt.cite_group_delimiter;
+                            }
                             number = new CSL.NumericBlob(false, num, this, Item.id);
                             formatter = new CSL.Util.Suffixator(CSL.SUFFIX_CHARS);
                             number.setFormatter(formatter);
@@ -157,7 +166,7 @@ CSL.Node.text = {
                     func = function (state, Item, item) {
                         var gender = state.opt.gender[Item.type];
                         var term = this.strings.term;
-                        term = state.getTerm(term, form, plural, gender, false, ("accessed" === term));
+                        term = state.getTerm(term, form, plural, gender, false, this.default_locale);
                         var myterm;
                         // if the term is not an empty string, say
                         // that we rendered a term

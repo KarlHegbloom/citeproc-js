@@ -498,9 +498,10 @@ CSL.Engine.prototype.processNumber = function (node, ItemObject, variable, type)
 
     function fixupRangeDelimiter(variable, val, rangeDelimiter, isNumeric) {
         var isPage = checkPage(variable, val);
-        if (rangeDelimiter === "-") {
+        var hasTerm = checkTerm(variable, val);
+        if (hasTerm && rangeDelimiter === "-") {
             if (isNumeric) {
-                if (isPage || (variable === "locator" && val.label === "art.") || ["issue", "volume", "edition", "number"].indexOf(variable) > -1) {
+                if (isPage || ["locator", "issue", "volume", "edition", "number"].indexOf(variable) > -1) {
                     rangeDelimiter = me.getTerm("page-range-delimiter")
                     if (!rangeDelimiter) {
                         rangeDelimiter = "\u2013";
@@ -522,7 +523,15 @@ CSL.Engine.prototype.processNumber = function (node, ItemObject, variable, type)
 
     function checkPage(variable, val) {
         return variable === "page" 
-            || (variable === "locator" && (["p.", "para.", "ch."].indexOf(val.label) > -1));
+            || (variable === "locator" && (["p."].indexOf(val.label) > -1));
+    }
+    
+    function checkTerm(variable, val) {
+        var ret = true;
+        if (variable === "locator") {
+            ret = !!me.getTerm(CSL.STATUTE_SUBDIV_STRINGS[val.label]);
+        }
+        return ret;
     }
 
     function manglePageNumbers(values, i, currentInfo) {

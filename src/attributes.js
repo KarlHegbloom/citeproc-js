@@ -1317,32 +1317,36 @@ CSL.Attributes["@year-range-format"] = function (state, arg) {
 
 
 CSL.Attributes["@default-locale"] = function (state, arg) {
-    var lst, len, pos, m, ret;
-    //
-    // Workaround for Internet Exploder 6 (doesn't recognize
-    // groups in str.split(/something(braced-group)something/)
-    //
-    m = arg.match(/-x-(sort|translit|translat)-/g);
-    if (m) {
-        for (pos = 0, len = m.length; pos < len; pos += 1) {
-            m[pos] = m[pos].replace(/^-x-/, "").replace(/-$/, "");
+    if (this.name === 'style') {
+        var lst, len, pos, m, ret;
+        //
+        // Workaround for Internet Exploder 6 (doesn't recognize
+        // groups in str.split(/something(braced-group)something/)
+        //
+        m = arg.match(/-x-(sort|translit|translat)-/g);
+        if (m) {
+            for (pos = 0, len = m.length; pos < len; pos += 1) {
+                m[pos] = m[pos].replace(/^-x-/, "").replace(/-$/, "");
+            }
         }
-    }
-    lst = arg.split(/-x-(?:sort|translit|translat)-/);
-    ret = [lst[0]];
-    for (pos = 1, len = lst.length; pos < len; pos += 1) {
-        ret.push(m[pos - 1]);
-        ret.push(lst[pos]);
-    }
-    lst = ret.slice();
-    len = lst.length;
-    for (pos = 1; pos < len; pos += 2) {
-        state.opt[("locale-" + lst[pos])].push(lst[(pos + 1)].replace(/^\s*/g, "").replace(/\s*$/g, ""));
-    }
-    if (lst.length) {
-        state.opt["default-locale"] = lst.slice(0, 1);
-    } else {
-        state.opt["default-locale"] = ["en"];
+        lst = arg.split(/-x-(?:sort|translit|translat)-/);
+        ret = [lst[0]];
+        for (pos = 1, len = lst.length; pos < len; pos += 1) {
+            ret.push(m[pos - 1]);
+            ret.push(lst[pos]);
+        }
+        lst = ret.slice();
+        len = lst.length;
+        for (pos = 1; pos < len; pos += 2) {
+            state.opt[("locale-" + lst[pos])].push(lst[(pos + 1)].replace(/^\s*/g, "").replace(/\s*$/g, ""));
+        }
+        if (lst.length) {
+            state.opt["default-locale"] = lst.slice(0, 1);
+        } else {
+            state.opt["default-locale"] = ["en"];
+        }
+    } else if (arg === "true") {
+        this.default_locale = true;
     }
 };
 

@@ -142,12 +142,12 @@ CSL.Output.Formatters.title = function (state, string) {
         return word;
     }
     function splitme (str, rex) {
-        var res, seps = str.match(rex);
-        if (seps) {
+        var m = str.match(rex);
+        if (m) {
             var splits = str.split(rex);
             res = [splits[0]];
-            for (var i=0; i<seps.length; i++) {
-                res.push(seps[i]);
+            for (var i=0; i<m.length; i++) {
+                res.push(m[i]);
                 res.push(splits[i+1]);
             }
         } else {

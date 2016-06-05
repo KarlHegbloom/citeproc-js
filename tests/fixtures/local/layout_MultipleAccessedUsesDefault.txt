@@ -27,7 +27,7 @@ The Story of Civilization, 24 mars 1894 (accessed February 15, 2000); The Story 
           <date variable="issued" form="text" date-parts="year-month-day"/>
         </group>
         <group delimiter=" " prefix="(" suffix=")">
-          <text term="accessed"/>
+          <text term="accessed" default-locale="true"/>
           <date variable="accessed" form="text" date-parts="year-month-day"/>
         </group>
       </group>
