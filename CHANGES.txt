@@ -1,6 +1,12 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.107
+==========================
+
+- Recognize default-locale on cs:date in rendering context.
+
+==========================
 Changes in version 1.1.106
 ==========================
 

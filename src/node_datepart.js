@@ -95,7 +95,7 @@ CSL.Node["date-part"] = {
                             myform = "numeric";
                         }
                     }
-                    value = CSL.Util.Dates[this.strings.name][myform](state, value, gender, ("accessed" === date_variable));
+                    value = CSL.Util.Dates[this.strings.name][myform](state, value, gender, this.default_locale);
                     if ("month" === this.strings.name) {
                         // XXXXX Cut-and-paste code in multiple locations. This code block should be
                         // collected in a function.
