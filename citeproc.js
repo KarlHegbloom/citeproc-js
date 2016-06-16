@@ -15621,6 +15621,118 @@ CSL.Output.Formats.prototype.rtf = {
         return str;
     }
 };
+CSL.Output.Formats.prototype.bbl = {
+    text_escape: function(text) {
+        if (text == null) {
+            text = '';
+        }
+        text = text.replace(/([$_^{%&])(?!!)/g, "\\$1").replace(/([$_^{%&])!/g, "$1").replace(/ v[.s] /g, " <abbr>v.</abbr> ").replace(/U.S.C./g, "<abbr>U.S.C.</abbr>").replace(/<abbr[^>]*>(.*)<\/abbr>/g, "\\abbr{$1}").replace(/\u00A0/g, "\\hspace{1spc}").replace(/\u00B6/g, "\\ParagraphSignGlyph").replace(/\u00A7/g, "\\SectionSignGlyph").replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
+            return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
+        }));
+        return text;
+    },
+    bibstart: '\\begin{thebibliography}{9999}\n\n',
+    bibend: '\\end{thebibliography}\n',
+    '@font-style/italic': '\\textit{%%STRING%%}',
+    '@font-style/oblique': '\\textsl{%%STRING%%}',
+    '@font-style/normal': '{\\upshape %%STRING%%}',
+    '@font-variant/small-caps': '\\textsc{%%STRING%%}',
+    '@passthrough/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@font-variant/normal': '{\\upshape \\mdseries %%STRING%%}',
+    '@font-weight/bold': '\\textbf{%%STRING%%}',
+    '@font-weight/normal': '{\\mdseries %%STRING%%}',
+    '@font-weight/light': false,
+    '@text-decoration/none': false,
+    '@text-decoration/underline': '\\underline{%%STRING%%}',
+    '@vertical-align/sup': '\\textsuperscript{%%STRING%%}',
+    '@vertical-align/sub': '\\textsubscript{%%STRING%%}',
+    '@vertical-align/baseline': false,
+    '@strip-periods/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@strip-periods/false': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@quotes/true': function(state, str) {
+        if (str == null) {
+            return '``';
+        }
+        return "``" + str + "''";
+    },
+    '@quotes/inner': function(state, str) {
+        if (str == null) {
+            return "'";
+        }
+        return "`" + str + "'";
+    },
+    '@quotes/false': false,
+    '@cite/entry': function(state, str) {
+        return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt, this.suffix_txt);
+    },
+    '@bibliography/entry': function(state, str) {
+        var citekey, error, insert, sys_id;
+        sys_id = state.registry.registry[this.system_id].ref.id;
+        try {
+            citekey = Zotero.BetterBibTeX.keymanager.get({itemID: sys_id}).citekey;
+	}
+	catch (x) {
+	    var callback = function(obj, worked) {
+		text = obj.string;
+	    };
+	    var translation = new Zotero.Translate.Export;
+	    translation.setTranslator("9cb70025-a888-4a29-a210-93ec52da40d4");//zotero's bibtex
+	    translation.setHandler("done", callback);
+            translation.setItems([sys_id]);
+	    translation.translate();
+	    key = text.replace(/@(?:.*){(.*),/, "\1");
+	    citekey = key;
+	}
+        insert = "";
+        if (state.sys.embedBibliographyEntry) {
+            insert = state.sys.embedBibliographyEntry(this.item_id);
+        }
+        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n\n";
+    },
+    '@display/block': function(state, str) {
+        return "\\ztNewBlock{" + str + "}\n";
+    },
+    '@display/left-margin': function(state, str) {
+        return "\\ztLeftMargin{" + str + "}";
+    },
+    '@display/right-inline': function(state, str) {
+        return "\\ztRightInline{" + str + "}\n";
+    },
+    '@display/indent': function(state, str) {
+        return "\\ztbibIndent{" + str + "}\n";
+    },
+    '@showid/true': function(state, str, cslid) {
+        var m, postPunct, prePunct;
+        if (!state.tmp.just_looking && !state.tmp.suppress_decorations) {
+            if (cslid) {
+                return "\\ztShowID{" + state.opt.nodenames[cslid] + "}{" + cslid + "}{" + str + "}";
+            } else if (this.params && "string" === typeof str) {
+                prePunct = "";
+                if (str) {
+                    m = str.match(CSL.VARIABLE_WRAPPER_PREPUNCT_REX);
+                    prePunct = m[1];
+                    str = m[2];
+                }
+                postPunct = "";
+                if (str && CSL.SWAPPING_PUNCTUATION.indexOf(str.slice(-1)) > -1) {
+                    postPunct = str.slice(-1);
+                    str = str.slice(0, -1);
+                }
+                return state.sys.variableWrapper(this.params, prePunct, str, postPunct);
+            } else {
+                return str;
+            }
+        } else {
+            return str;
+        }
+    },
+    '@URL/true': function(state, str) {
+        return "\\ztHref{" + str + "}{" + str + "}";
+    },
+    '@DOI/true': function(state, str) {
+        return "\\ztHref{http://dx.doi.org/" + str + "}{" + str + "}";
+    }
+};
 CSL.Output.Formats = new CSL.Output.Formats();
 CSL.Registry = function (state) {
     var pos, len, ret, i, ilen;
