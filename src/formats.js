@@ -394,46 +394,20 @@ CSL.Output.Formats.prototype.bbl = {
     },
     '@quotes/false': false,
     '@cite/entry': function(state, str) {
-        //Zotero.BetterBibTeX.debug('bbl.@cite/entry:', state.registry.registry[this.system_id].ref.id);
         return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt, this.suffix_txt);
     },
     '@bibliography/entry': function(state, str) {
-        var citekey, error, insert, sys_id;
+        var citekey, insert, sys_id;
         sys_id = state.registry.registry[this.system_id].ref.id;
-        //Zotero.BetterBibTeX.debug('bbl.@bibliography/entry:', sys_id);
-        try {
-            citekey = Zotero.BetterBibTeX.keymanager.get({itemID: sys_id}).citekey;
-	    //citekey = Zotero.BetterBibTeX.keymanager.get(zotero_item, 'on-export').citekey
-	}
-	catch (x) {
-	    // BetterBibTeX likely not installed : use zotero's default key scheme
-	    // but no simple method to call to get the key
-	    // we fake export and extract the key in it
-	    var callback = function(obj, worked) {
-		text = obj.string;
-	    };
-	    var translation = new Zotero.Translate.Export;
-	    translation.setTranslator("9cb70025-a888-4a29-a210-93ec52da40d4");//zotero's bibtex
-	    translation.setHandler("done", callback);
-	    
-	    //translation.setItems([zotero_item]);
-            translation.setItems([sys_id]);
-	    translation.translate();
-	    key = text.replace(/@(?:.*){(.*),/, "\1");
-	    citekey = key;
-	}
-        // try {
-        //     citekey = Zotero.BetterBibTeX.keymanager.get({
-        //         itemID: sys_id
-        //     }).citekey;
-        // } catch (error) {
-        //     citekey = '@@';
-        // }
+        citekey = "sys_id_" + sys_id;
+        if (state.sys.getBibTeXCiteKey) {
+            citekey = state.sys.getBibTeXCiteKey(sys_id, state);
+        }
         insert = "";
         if (state.sys.embedBibliographyEntry) {
             insert = state.sys.embedBibliographyEntry(this.item_id);
         }
-        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n\n";
+        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";

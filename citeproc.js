@@ -15666,28 +15666,17 @@ CSL.Output.Formats.prototype.bbl = {
         return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt, this.suffix_txt);
     },
     '@bibliography/entry': function(state, str) {
-        var citekey, error, insert, sys_id;
+        var citekey, insert, sys_id;
         sys_id = state.registry.registry[this.system_id].ref.id;
-        try {
-            citekey = Zotero.BetterBibTeX.keymanager.get({itemID: sys_id}).citekey;
-	}
-	catch (x) {
-	    var callback = function(obj, worked) {
-		text = obj.string;
-	    };
-	    var translation = new Zotero.Translate.Export;
-	    translation.setTranslator("9cb70025-a888-4a29-a210-93ec52da40d4");//zotero's bibtex
-	    translation.setHandler("done", callback);
-            translation.setItems([sys_id]);
-	    translation.translate();
-	    key = text.replace(/@(?:.*){(.*),/, "\1");
-	    citekey = key;
-	}
+        citekey = "sys_id_" + sys_id;
+        if (state.sys.getBibTeXCiteKey) {
+            citekey = state.sys.getBibTeXCiteKey(sys_id, state);
+        }
         insert = "";
         if (state.sys.embedBibliographyEntry) {
             insert = state.sys.embedBibliographyEntry(this.item_id);
         }
-        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n\n";
+        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
