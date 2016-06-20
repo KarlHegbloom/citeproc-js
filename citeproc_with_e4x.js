@@ -15627,9 +15627,19 @@ CSL.Output.Formats.prototype.bbl = {
         if (text == null) {
             text = '';
         }
-        text = text.replace(/([$_^{%&])(?!!)/g, "\\$1").replace(/([$_^{%&])!/g, "$1").replace(/ v[.s] /g, " <abbr>v.</abbr> ").replace(/U.S.C./g, "<abbr>U.S.C.</abbr>").replace(/<abbr[^>]*>(.*)<\/abbr>/g, "\\abbr{$1}").replace(/\u00A0/g, "\\hspace{1spc}").replace(/\u00B6/g, "\\ParagraphSignGlyph").replace(/\u00A7/g, "\\SectionSignGlyph").replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
-            return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
-        }));
+        text = text
+            .replace(/([$_^{%&])(?!!)/g, "\\$1")
+            .replace(/([$_^{%&])!/g, "$1")
+            .replace(/ v[.s] /g, " <abbr>v.</abbr> ")
+            .replace(/U.S.C./g, "<abbr>U.S.C.</abbr>")
+            .replace(/ ((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.) /, " <abbr>$1</abbr> ")
+            .replace(/<abbr[^>]*>(.*)<\/abbr>/g, "\\abbr{$1}")
+            .replace(/\u00A0/g, "\\hspace{1spc}")
+            .replace(/\u00B6/g, "\\ParagraphSignGlyph")
+            .replace(/\u00A7/g, "\\SectionSignGlyph")
+            .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
+                return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
+            }));
         return text;
     },
     bibstart: '\\begin{thebibliography}{9999}\n\n',
