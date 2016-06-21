@@ -15629,7 +15629,7 @@ CSL.Output.Formats.prototype.bbl = {
         text = text
             .replace(/([$_^{%&])(?!!)/g, "\\$1")
             .replace(/([$_^{%&])!/g, "$1")
-            .replace(/<abbr[^>]*>(.*)<\/abbr>/g, "\\abbr{$1}")
+            .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
             .replace(/\u00A0/g, "\\hspace{1spc}")
             .replace(/\u00B6/g, "\\ParagraphSignGlyph")
             .replace(/\u00A7/g, "\\SectionSignGlyph")
