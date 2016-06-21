@@ -360,9 +360,9 @@ CSL.Output.Formats.prototype.bbl = {
         text = text
             .replace(/([$_^{%&])(?!!)/g, "\\$1")
             .replace(/([$_^{%&])!/g, "$1")
-            .replace(/ v[.s] /g, " <abbr>v.</abbr> ")
-            .replace(/U.S.C./g, "<abbr>U.S.C.</abbr>")
-            .replace(/ ((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.) /, " <abbr>$1</abbr> ")
+            //.replace(/ v[.s] /g, " <abbr>v.</abbr> ")
+            //.replace(/U.S.C./g, "<abbr>U.S.C.</abbr>")
+            //.replace(/((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\.)/, "<abbr>$1</abbr>")
             .replace(/<abbr[^>]*>(.*)<\/abbr>/g, "\\abbr{$1}")
             .replace(/\u00A0/g, "\\hspace{1spc}")
             .replace(/\u00B6/g, "\\ParagraphSignGlyph")
