@@ -15722,7 +15722,7 @@ CSL.Output.Formats.prototype.bbl = {
         if (state.sys.embedBibliographyEntry) {
             insert = state.sys.embedBibliographyEntry(this.item_id);
         }
-        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}\n";
+        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}%\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
