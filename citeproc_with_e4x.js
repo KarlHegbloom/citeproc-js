@@ -15670,6 +15670,8 @@ CSL.Output.Formats.prototype.bbl = {
             .replace(/([$_^{%&])!/g, "$1")
             .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
             .replace(/\u00A0/g, "\\hspace{1spc}")
+            .replace(/\u2009/g, "\\hspace{0.17em}")
+            .replace(/\u202F/g, "\\hspace{0.17em}")
             .replace(/\u00B6/g, "\\ParagraphSignGlyph{}")
             .replace(/\u00A7/g, "\\SectionSignGlyph{}")
             .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
@@ -15677,8 +15679,8 @@ CSL.Output.Formats.prototype.bbl = {
             }));
         return text;
     },
-    bibstart: '\\begin{thebibliography}{9999}\n\n',
-    bibend: '\\end{thebibliography}\n',
+    bibstart: '',
+    bibend: '',
     '@font-style/italic': '\\textit{%%STRING%%}',
     '@font-style/oblique': '\\textsl{%%STRING%%}',
     '@font-style/normal': '{\\upshape %%STRING%%}',
@@ -15722,7 +15724,7 @@ CSL.Output.Formats.prototype.bbl = {
         if (state.sys.embedBibliographyEntry) {
             insert = state.sys.embedBibliographyEntry(this.item_id);
         }
-        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\bibitem{" + citekey + "}" + str + "}%\n";
+        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\ztbibitem{" + citekey + "}" + str + "}%\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
