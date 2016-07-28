@@ -9,6 +9,13 @@ citation
 <<===== RESULT =====<<
 
 
+>>===== OPTIONS =====>>
+{
+   "static_statute_locator":true
+}
+<<===== OPTIONS =====<<
+	 
+
 >>===== CITATIONS =====>>
 [
     [

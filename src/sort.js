@@ -17,6 +17,9 @@ CSL.getSortCompare = function (default_locale) {
         default_locale = "en-US";
     }
     strcmp = function (a, b) {
+        //var ret = a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase(),default_locale,strcmp_opts);
+        // print(ret+' ('+a+') :: ('+b+')');
+        //return ret;
         return a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase(),default_locale,strcmp_opts);
     };
     var stripPunct = function (str) {

@@ -10,7 +10,7 @@ citation
 
 >>===== OPTIONS =====>>
 {
-   "static_statute_locator":false,
+   "static_statute_locator":true,
    "clobber_locator_if_no_statute_section":false,
    "handle_parallel_articles": false
 }

@@ -111,17 +111,40 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
 			tertiary = this.fixupInstitution(tertiary, v, j);
         }
 	}
+    var n = {
+        l: {
+            pri: false,
+            sec: false,
+            ter: false
+        },
+        s: {
+            pri: false,
+            sec: false,
+            ter: false
+        }
+    };
+    if (primary) {
+        n.l.pri = primary["long"];
+        n.s.pri = primary["short"].length ? primary["short"] : primary["long"];
+    }
+    if (secondary) {
+        n.l.sec = secondary["long"];
+        n.s.sec = secondary["short"].length ? secondary["short"] : secondary["long"];
+    }
+    if (tertiary) {
+        n.l.ter = tertiary["long"];
+        n.s.ter = tertiary["short"].length ? tertiary["short"] : tertiary["long"];
+    }
     switch (this.institution.strings["institution-parts"]) {
     case "short":
         // No multilingual for pure short form institution names.
         if (primary["short"].length) {
             short_style = this._getShortStyle();
-            institution = [this._renderOneInstitutionPart(primary["short"], short_style)];
+            institution = [this._composeOneInstitutionPart([n.s.pri, n.s.sec, n.s.ter], slot, short_style)];
         } else {
             // Fail over to long.
             long_style = this._getLongStyle(primary, v, j);
-            institution_long = this._composeOneInstitutionPart([primary, secondary, tertiary], slot, long_style);
-            institution = [institution_long];
+            institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style)];
         }
         break;
     case "short-long":
@@ -129,7 +152,7 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         short_style = this._getShortStyle();
         institution_short = this._renderOneInstitutionPart(primary["short"], short_style);
         // true is to include multilingual supplement
-        institution_long = this._composeOneInstitutionPart([primary, secondary, tertiary], slot, long_style);
+        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style);
         institution = [institution_short, institution_long];
         break;
     case "long-short":
@@ -137,13 +160,13 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         short_style = this._getShortStyle();
         institution_short = this._renderOneInstitutionPart(primary["short"], short_style);
         // true is to include multilingual supplement
-        institution_long = this._composeOneInstitutionPart([primary, secondary, tertiary], slot, long_style, true);
+        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, true);
         institution = [institution_long, institution_short];
         break;
     default:
         long_style = this._getLongStyle(primary, v, j);
         // true is to include multilingual supplement
-        institution = [this._composeOneInstitutionPart([primary, secondary, tertiary], slot, long_style)];
+        institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style)];
         break;
     }
     return this._join(institution, " ");
@@ -152,13 +175,13 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
 CSL.NameOutput.prototype._composeOneInstitutionPart = function (names, slot, style) {
     var primary = false, secondary = false, tertiary = false;
     if (names[0]) {
-        primary = this._renderOneInstitutionPart(names[0]["long"], style);
+        primary = this._renderOneInstitutionPart(names[0], style);
     }
     if (names[1]) {
-        secondary = this._renderOneInstitutionPart(names[1]["long"], style);
+        secondary = this._renderOneInstitutionPart(names[1], style);
     }
     if (names[2]) {
-        tertiary = this._renderOneInstitutionPart(names[2]["long"], style);
+        tertiary = this._renderOneInstitutionPart(names[2], style);
     }
     // Compose
     var institutionblob;
@@ -422,11 +445,11 @@ CSL.NameOutput.prototype._renderOnePersonalName = function (value, pos, i, j) {
         // ok with no affixes here
         if (this.state.opt["demote-non-dropping-particle"] === "never") {
             first = this._join([non_dropping_particle, family, dropping_particle], " ");
-            merged = this._join([first, given], "0");
+            merged = this._join([first, given], this.state.opt.sort_sep);
             blob = this._join([merged, suffix], " ");
         } else {
             second = this._join([given, dropping_particle, non_dropping_particle], " ");
-            merged = this._join([family, second], "0");
+            merged = this._join([family, second], this.state.opt.sort_sep);
             blob = this._join([merged, suffix], " ");
         }
     } else if (this.name.strings["name-as-sort-order"] === "all" || (this.name.strings["name-as-sort-order"] === "first" && i === 0 && (j === 0 || "undefined" === typeof j))) {

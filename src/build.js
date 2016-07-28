@@ -194,6 +194,12 @@ CSL.Engine = function (sys, style, lang, forceLang) {
     if (!this.opt["default-locale-sort"]) {
         this.opt["default-locale-sort"] = this.opt["default-locale"][0];
     }
+    // Test processor against JS engine locale mess to find a field separator that works
+    if ('dale|'.localeCompare('daleb', this.opt["default-locale-sort"]) > -1) {
+        this.opt.sort_sep = "@";
+    } else {
+        this.opt.sort_sep = "|";
+    }
     this.localeConfigure(langspec);
 
     // Build skip-word regexp

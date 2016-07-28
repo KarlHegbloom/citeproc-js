@@ -121,7 +121,9 @@ CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, 
             this.transform.loadAbbreviation("default", "hereinafter", Item.id);
         }
         item = CSL.parseLocator.call(this, item);
-        this.remapSectionVariable([[Item,item]]);
+        if (this.opt.development_extensions.static_statute_locator) {
+            this.remapSectionVariable([[Item,item]]);
+        }
         if (this.opt.development_extensions.locator_label_parse) {
             if (item.locator && ["bill","gazette","legislation","regulation","treaty"].indexOf(Item.type) === -1 && (!item.label || item.label === 'page')) {
                 m = CSL.LOCATOR_LABELS_REGEXP.exec(item.locator);
@@ -754,7 +756,9 @@ CSL.Engine.prototype.makeCitationCluster = function (rawList) {
         newitem = [Item, item];
         inputList.push(newitem);
     }
-    this.remapSectionVariable(inputList);
+    if (this.opt.development_extensions.static_statute_locator) {
+        this.remapSectionVariable(inputList);
+    }
     if (inputList && inputList.length > 1 && this.citation_sort.tokens.length > 0) {
         len = inputList.length;
         for (pos = 0; pos < len; pos += 1) {

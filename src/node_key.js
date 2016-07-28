@@ -174,7 +174,7 @@ CSL.Node.key = {
             if (state.sys.normalizeUnicode) {
                 keystring = state.sys.normalizeUnicode(keystring);
             }
-            keystring = keystring.split(" ").join("A");
+            keystring = keystring ? (keystring.split(" ").join(state.opt.sort_sep) + state.opt.sort_sep) : "";
             //SNIP-START
             if (debug) {
                 CSL.debug("keystring: " + keystring + " " + typeof keystring);

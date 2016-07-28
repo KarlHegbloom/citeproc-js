@@ -1,6 +1,49 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.113
+==========================
+
+- Fix missing argument in log function.
+
+==========================
+Changes in version 1.1.112
+==========================
+
+- Fix multilingual bug, triggered by settings that invoked
+  a tertiary variant.
+
+==========================
+Changes in version 1.1.111
+==========================
+
+- Do not throw on CSL error. Use dump if console not available.
+
+==========================
+Changes in version 1.1.110
+==========================
+
+- Fix erroneous remap of CSL section field to locator in vanilla
+  CSL.
+
+    https://forums.zotero.org/discussion/59427/citation-of-a-law/
+
+==========================
+Changes in version 1.1.109
+==========================
+
+- Fix sort errors in Scandinavian locales that erupted here:
+
+    https://forums.zotero.org/discussion/59907/odd-behaviour-when-sorting-in-danish/
+
+==========================
+Changes in version 1.1.108
+==========================
+
+- Show language variants of institutions even when external abbreviation
+  is applied.
+
+==========================
 Changes in version 1.1.107
 ==========================
 

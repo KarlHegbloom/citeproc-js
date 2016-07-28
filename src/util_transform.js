@@ -504,7 +504,7 @@ CSL.Transform = function (state) {
                     tertiary_outer.decorations.push(["@font-weight", "normal"]);
                     state.output.openLevel(tertiary_outer);
                     state.output.append(tertiary, tertiary_tok);
-                    state.output.openLevel(tertiary_outer);
+                    state.output.closeLevel();
 
                     var blob_obj = state.output.current.value();
                     var blobs_pos = state.output.current.value().blobs.length - 1;
