@@ -15623,22 +15623,15 @@ CSL.Output.Formats.prototype.rtf = {
 };
 CSL.Output.Formats.prototype.bbl = {
     text_escape: function(text) {
-        if (text == null) {
-            text = '';
+        if (!text) {
+            text = "";
         }
-        text = text
-            .replace(/([$_^{%&])(?!!)/g, "\\$1")
+        return text.replace(/([$_^{%&])(?!!)/g, "\\$1")
             .replace(/([$_^{%&])!/g, "$1")
             .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
-            .replace(/\u00A0/g, "\\hspace{1spc}")
-            .replace(/\u2009/g, "\\hspace{0.17em}")
-            .replace(/\u202F/g, "\\hspace{0.17em}")
-            .replace(/\u00B6/g, "\\ParagraphSignGlyph{}")
-            .replace(/\u00A7/g, "\\SectionSignGlyph{}")
             .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
                 return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
             }));
-        return text;
     },
     bibstart: '',
     bibend: '',
@@ -15647,7 +15640,7 @@ CSL.Output.Formats.prototype.bbl = {
     '@font-style/normal': '{\\upshape %%STRING%%}',
     '@font-variant/small-caps': '\\textsc{%%STRING%%}',
     '@passthrough/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
-    '@font-variant/normal': '{\\upshape \\mdseries %%STRING%%}',
+    '@font-variant/normal': '{\\rmfamily \\upshape \\mdseries %%STRING%%}',
     '@font-weight/bold': '\\textbf{%%STRING%%}',
     '@font-weight/normal': '{\\mdseries %%STRING%%}',
     '@font-weight/light': false,
@@ -15659,20 +15652,25 @@ CSL.Output.Formats.prototype.bbl = {
     '@strip-periods/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
     '@strip-periods/false': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
     '@quotes/true': function(state, str) {
-        if (str == null) {
-            return '``';
+        if ('undefined' === typeof(str)) {
+            return state.getTerm("open-quote");
         }
-        return "``" + str + "''";
+        return state.getTerm("open-quote") + str + state.getTerm("close-quote");
     },
     '@quotes/inner': function(state, str) {
-        if (str == null) {
-            return "'";
+        if ('undefined' === typeof(str)) {
+            return "\u2019";
         }
-        return "`" + str + "'";
+        return state.getTerm("open-inner-quote") + str + state.getTerm("close-inner-quote");
     },
     '@quotes/false': false,
     '@cite/entry': function(state, str) {
-        return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt, this.suffix_txt);
+        return state.sys.wrapCitationEntry(state,
+                                           str,
+                                           state.registry.registry[this.system_id].ref.id,
+                                           this.item_id,
+                                           this.locator_txt,
+                                           this.suffix_txt);
     },
     '@bibliography/entry': function(state, str) {
         var citekey, insert, sys_id;
@@ -15685,7 +15683,7 @@ CSL.Output.Formats.prototype.bbl = {
         if (state.sys.embedBibliographyEntry) {
             insert = state.sys.embedBibliographyEntry(this.item_id);
         }
-        return "\\ztbibItemText{\\zbibCitationItemID{" + sys_id + "}" + insert + "\\ztbibitem{" + citekey + "}" + str + "}%\n";
+        return "\\ztbibItemText{" + sys_id + "}{" + insert + "}{" + citekey + "}{" + str + "}%\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
