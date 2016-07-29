@@ -15704,9 +15704,9 @@ CSL.Output.Formats.prototype.bbl = {
     },
     '@quotes/false': false,
     '@cite/entry': function(state, str) {
+        console.log("@cite/entry called.\n");
         return state.sys.wrapCitationEntry(state,
                                            str,
-                                           state.registry.registry[this.system_id].ref.id,
                                            this.item_id,
                                            this.locator_txt,
                                            this.suffix_txt);
@@ -15714,13 +15714,19 @@ CSL.Output.Formats.prototype.bbl = {
     '@bibliography/entry': function(state, str) {
         var citekey, insert, sys_id;
         sys_id = state.registry.registry[this.system_id].ref.id;
-        citekey = "sys_id_" + sys_id;
+        citekey = "sysID" + sys_id;
         if (state.sys.getBibTeXCiteKey) {
-            citekey = state.sys.getBibTeXCiteKey(sys_id, state);
+            citekey = state.sys.getBibTeXCiteKey(sys_id, state).replace(/([$_^{%&])(?!!)/g, "\\$1");
         }
         insert = "";
         if (state.sys.embedBibliographyEntry) {
-            insert = state.sys.embedBibliographyEntry(this.item_id);
+            console.log("state.sys.embedBibliographyEntry is defined.");
+        }
+        if (Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
+            console.log("state.sys.prototype.embedBibliographyEntry is defined.");
+        }
+        if (state.sys.embedBibliographyEntry || Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
+            insert = state.sys.embedBibliographyEntry(state, this.item_id);
         }
         return "\\ztbibItemText{" + sys_id + "}{" + insert + "}{" + citekey + "}{" + str + "}%\n";
     },
