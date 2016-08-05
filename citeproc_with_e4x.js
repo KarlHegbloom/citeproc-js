@@ -15665,7 +15665,7 @@ CSL.Output.Formats.prototype.bbl = {
         if (!text) {
             text = "";
         }
-        return text.replace(/([$_^{%&])(?!!)/g, "\\$1")
+        return text.replace(/(?!\\)([$_^{%&])(?!!)/g, "\\$1")
             .replace(/([$_^{%&])!/g, "$1")
             .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
             .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
