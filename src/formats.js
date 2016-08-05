@@ -360,11 +360,6 @@ CSL.Output.Formats.prototype.bbl = {
         return text.replace(/(?!\\)([$_^{%&])(?!!)/g, "\\$1")
             .replace(/([$_^{%&])!/g, "$1")
             .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
-        //.replace(/\u00A0/g, "\\hspace{1spc}")
-        //.replace(/\u2009/g, "\\hspace{0.17em}")
-        //.replace(/\u202F/g, "\\hspace{0.17em}")
-        //.replace(/\u00B6/g, "\\ParagraphSignGlyph{}")
-        //.replace(/\u00A7/g, "\\SectionSignGlyph{}")
             .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
                 return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
             }));
