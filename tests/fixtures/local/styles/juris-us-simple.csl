@@ -38,7 +38,7 @@
       <date-part name="year"/>
     </date>
   </locale>
-  
+
   <macro name="juris-title">
     <choose>
       <if type="legal_case">
@@ -63,7 +63,13 @@
             </group>
           </if>
           <else>
-            <text variable="title" form="short" text-case="uppercase" prefix="From module: "/>
+            <group delimiter=" " prefix="From module: ">
+              <names variable="author">
+                <name/>
+                <institution/>
+              </names>
+              <text variable="title" form="short" text-case="uppercase"/>
+            </group>
           </else>
         </choose>
       </if>

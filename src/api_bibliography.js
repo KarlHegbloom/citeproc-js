@@ -79,6 +79,7 @@ CSL.getBibliographyEntries = function (bibsection) {
     ret = [];
     entry_item_data = [];
     this.tmp.area = "bibliography";
+    this.tmp.root = "bibliography";
     this.tmp.last_rendered_name = false;
     this.tmp.bibliography_errors = [];
     this.tmp.bibliography_pos = 0;

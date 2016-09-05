@@ -576,10 +576,10 @@ CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, 
         }
     }
     if (this.opt.citation_number_sort && sortedItems && sortedItems.length > 1 && this.citation_sort.tokens.length > 0) {
-        for (i = 0, ilen = sortedItems.length; i < ilen; i += 1) {
-            sortedItems[i][1].sortkeys = CSL.getSortKeys.call(this, sortedItems[i][0], "citation_sort");
-        }
         if (!citation.properties.unsorted) {
+            for (i = 0, ilen = sortedItems.length; i < ilen; i += 1) {
+                sortedItems[i][1].sortkeys = CSL.getSortKeys.call(this, sortedItems[i][0], "citation_sort");
+            }
             sortedItems.sort(this.citation.srt.compareCompositeKeys);
         }
     }
@@ -673,6 +673,12 @@ CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, 
                 continue;
             }
             var mycitation = this.registry.citationreg.citationById[key];
+            if (!mycitation.properties.unsorted) {
+                for (i = 0, ilen = mycitation.sortedItems.length; i < ilen; i += 1) {
+                    mycitation.sortedItems[i][1].sortkeys = CSL.getSortKeys.call(this, mycitation.sortedItems[i][0], "citation_sort");
+                }
+                mycitation.sortedItems.sort(this.citation.srt.compareCompositeKeys);
+            }
             // For error reporting
             this.tmp.citation_pos = mycitation.properties.index;
             this.tmp.citation_note_index = mycitation.properties.noteIndex;
@@ -820,6 +826,7 @@ CSL.getAmbiguousCite = function (Item, disambig, visualForm, item) {
         }
     }
     this.tmp.area = "citation";
+    this.tmp.root = "citation";
     this.parallel.use_parallels = (this.parallel.use_parallels === true || this.parallel.use_parallels === null) ? null : false;
     this.tmp.suppress_decorations = true;
     this.tmp.just_looking = true;
@@ -893,6 +900,7 @@ CSL.getCitationCluster = function (inputList, citationID) {
     this.tmp.last_primary_names_string = false;
     txt_esc = CSL.getSafeEscape(this);
     this.tmp.area = "citation";
+    this.tmp.root = "citation";
     result = "";
     objects = [];
     this.tmp.last_suffix_used = "";
@@ -1307,23 +1315,27 @@ CSL.citeStart = function (Item, item, blockShadowNumberReset) {
     } else {
         this.tmp.disambig_settings = new CSL.AmbigConfig();
     }
-    if (this.tmp.area !== 'citation' && this.registry.registry[Item.id]) {
-        this.tmp.disambig_restore = CSL.cloneAmbigConfig(this.registry.registry[Item.id].disambig);
-        if (this.tmp.area === 'bibliography' && this.tmp.disambig_settings && this.tmp.disambig_override) {
-            if (this.opt["disambiguate-add-names"]) {
-                this.tmp.disambig_settings.names = this.registry.registry[Item.id].disambig.names.slice();
-                this.tmp.disambig_request.names = this.registry.registry[Item.id].disambig.names.slice();
-            }
-            if (this.opt["disambiguate-add-givenname"]) {
-                // This is weird and delicate and not fully understood
-                this.tmp.disambig_request = this.tmp.disambig_settings;
-                this.tmp.disambig_settings.givens = this.registry.registry[Item.id].disambig.givens.slice();
-                this.tmp.disambig_request.givens = this.registry.registry[Item.id].disambig.givens.slice();
-                for (var i=0,ilen=this.tmp.disambig_settings.givens.length;i<ilen;i+=1) {
-                    this.tmp.disambig_settings.givens[i] = this.registry.registry[Item.id].disambig.givens[i].slice();
+    if (this.tmp.area !== 'citation') {
+        if (!this.registry.registry[Item.id]) {
+            this.tmp.disambig_restore = new CSL.AmbigConfig();
+        } else {
+            this.tmp.disambig_restore = CSL.cloneAmbigConfig(this.registry.registry[Item.id].disambig);
+            if (this.tmp.area === 'bibliography' && this.tmp.disambig_settings && this.tmp.disambig_override) {
+                if (this.opt["disambiguate-add-names"]) {
+                    this.tmp.disambig_settings.names = this.registry.registry[Item.id].disambig.names.slice();
+                    this.tmp.disambig_request.names = this.registry.registry[Item.id].disambig.names.slice();
                 }
-                for (var i=0,ilen=this.tmp.disambig_request.givens.length;i<ilen;i+=1) {
-                    this.tmp.disambig_request.givens[i] = this.registry.registry[Item.id].disambig.givens[i].slice();
+                if (this.opt["disambiguate-add-givenname"]) {
+                    // This is weird and delicate and not fully understood
+                    this.tmp.disambig_request = this.tmp.disambig_settings;
+                    this.tmp.disambig_settings.givens = this.registry.registry[Item.id].disambig.givens.slice();
+                    this.tmp.disambig_request.givens = this.registry.registry[Item.id].disambig.givens.slice();
+                    for (var i=0,ilen=this.tmp.disambig_settings.givens.length;i<ilen;i+=1) {
+                        this.tmp.disambig_settings.givens[i] = this.registry.registry[Item.id].disambig.givens[i].slice();
+                    }
+                    for (var i=0,ilen=this.tmp.disambig_request.givens.length;i<ilen;i+=1) {
+                        this.tmp.disambig_request.givens[i] = this.registry.registry[Item.id].disambig.givens[i].slice();
+                    }
                 }
             }
         }

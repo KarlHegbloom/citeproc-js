@@ -8,9 +8,15 @@ CSL.Node.key = {
         var func, i, ilen;
         var debug = false;
         var start_key = new CSL.Token("key", CSL.START);
-        start_key.strings["et-al-min"] = this.strings["et-al-min"];
-        start_key.strings["et-al-use-first"] = this.strings["et-al-use-first"];
-        start_key.strings["et-al-use-last"] = this.strings["et-al-use-last"];
+
+        state.tmp.root = state.build.root;
+
+        // The params object for build and runtime (tmp) really shouldn't have been separated.
+        // Oh, well.
+        start_key.strings["et-al-min"] = state.inheritOpt(this, "et-al-min");
+        start_key.strings["et-al-use-first"] = state.inheritOpt(this, "et-al-use-first");
+        start_key.strings["et-al-use-last"] = state.inheritOpt(this, "et-al-use-last");
+
 
         // initialize done vars
         func = function (state, Item) {
@@ -47,14 +53,14 @@ CSL.Node.key = {
         func = function (state, Item) {
             state.tmp.sort_key_flag = true;
             //print("== key node function ==");
-            if (this.strings["et-al-min"]) {
-                state.tmp["et-al-min"] = this.strings["et-al-min"];
+            if (state.inheritOpt(this, "et-al-min")) {
+                state.tmp["et-al-min"] = state.inheritOpt(this, "et-al-min");
             }
-            if (this.strings["et-al-use-first"]) {
-                state.tmp["et-al-use-first"] = this.strings["et-al-use-first"];
+            if (state.inheritOpt(this, "et-al-use-first")) {
+                state.tmp["et-al-use-first"] = state.inheritOpt(this, "et-al-use-first");
             }
-            if ("boolean" === typeof this.strings["et-al-use-last"]) {
-                state.tmp["et-al-use-last"] = this.strings["et-al-use-last"];
+            if ("boolean" === typeof state.inheritOpt(this, "et-al-use-last")) {
+                state.tmp["et-al-use-last"] = state.inheritOpt(this, "et-al-use-last");
                 //print("  set tmp et-al-use-last: "+this.strings["et-al-use-last"])
             }
         };
@@ -72,10 +78,10 @@ CSL.Node.key = {
             // be a little more conservative, but secondary sorts
             // by this variable seem unlikely.
             if (variable === "citation-number") {
-                if (state.build.area === "citation_sort") {
+                if (state.build.area === "citation" && state.build.extension === "_sort") {
                     state.opt.citation_number_sort = true;
                 }
-                if (state.build.area === "bibliography_sort") {
+                if (state.build.root === "bibliography" && state.build.extension === "_sort") {
                     state.opt.citation_number_sort_used = true;
                 }
             }
@@ -92,9 +98,9 @@ CSL.Node.key = {
                 name_token.tokentype = CSL.SINGLETON;
                 name_token.strings["name-as-sort-order"] = "all";
                 name_token.strings["sort-separator"] = " ";
-                name_token.strings["et-al-use-last"] = this.strings["et-al-use-last"];
-                name_token.strings["et-al-min"] = this.strings["et-al-min"];
-                name_token.strings["et-al-use-first"] = this.strings["et-al-use-first"];
+                name_token.strings["et-al-use-last"] = state.inheritOpt(this, "et-al-use-last");
+                name_token.strings["et-al-min"] = state.inheritOpt(this, "et-al-min");
+                name_token.strings["et-al-use-first"] = state.inheritOpt(this, "et-al-use-first");
                 CSL.Node.name.build.call(name_token, state, target);
                 //
                 // Institution tag
@@ -195,7 +201,7 @@ CSL.Node.key = {
 
         // Set year-suffix key on anything that looks like a date
         if (state.build.date_key) {
-            if (state.build.area === "citation_sort") {
+            if (state.build.area === "citation" && state.build.extension === "_sort") {
                 // ascending sort always
                 state[state.build.area].opt.sort_directions.push([-1,1]);
                 func = function (state, Item) {

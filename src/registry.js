@@ -700,16 +700,19 @@ CSL.Registry.prototype.registerAmbigToken = function (akey, id, ambig_config) {
  * <p>This is used internally by the Registry.</p>
  */
 CSL.getSortKeys = function (Item, key_type) {
-    var area, extension, strip_prepositions, use_parallels, len, pos;
+    var area, root, extension, strip_prepositions, use_parallels, len, pos;
     //SNIP-START
     if (false) {
         CSL.debug("KEY TYPE: " + key_type);
     }
     //SNIP-END
     area = this.tmp.area;
+    root = this.tmp.root;
     extension = this.tmp.extension;
     strip_prepositions = CSL.Util.Sort.strip_prepositions;
     this.tmp.area = key_type;
+    // Gawdawful, this.
+    this.tmp.root = key_type.indexOf("_") > -1 ? key_type.slice(0,-5) : key_type;
     this.tmp.extension = "_sort";
     this.tmp.disambig_override = true;
     this.tmp.disambig_request = false;
@@ -730,6 +733,7 @@ CSL.getSortKeys = function (Item, key_type) {
     //SNIP-END
     
     this.tmp.area = area;
+    this.tmp.root = root;
     this.tmp.extension = extension;
     return this[key_type].keys;
 };

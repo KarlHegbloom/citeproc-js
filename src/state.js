@@ -6,6 +6,7 @@ CSL.Engine.Opt = function () {
     this.dates = {};
     this.jurisdictions_seen = {};
     this.suppressedJurisdictions = {};
+    this.inheritedAttributes = {};
     this["locale-sort"] = [];
     this["locale-translit"] = [];
     this["locale-translat"] = [];
@@ -431,7 +432,9 @@ CSL.Engine.Citation = function (state) {
      // Holds a mixture of persistent and ephemeral
      // options and scratch data used during processing of
      // a citation.</p>
-    this.opt = {};
+    this.opt = {
+        inheritedAttributes: {}
+    };
 
     this.tokens = [];
     // Placeholder function
@@ -462,7 +465,9 @@ CSL.Engine.Citation = function (state) {
 
 
 CSL.Engine.Bibliography = function () {
-    this.opt = {};
+    this.opt = {
+        inheritedAttributes: {}
+    };
     this.tokens = [];
 
     this.opt.collapse = [];

@@ -39,7 +39,9 @@ CSL.NameOutput.prototype.init = function (names) {
         }
     }
     this["et-al"] = undefined;
+    // REMOVE THIS
     this["with"] = undefined;
+
     this.name = undefined;
     // long, long-with-short, short
     this.institutionpart = {};
@@ -262,7 +264,7 @@ CSL.NameOutput.prototype.outputNames = function () {
     }
     //SNIP-END
     this.state.output.openLevel("empty");
-    this.state.output.current.value().strings.delimiter = this.names.strings.delimiter;
+    this.state.output.current.value().strings.delimiter = this.state.inheritOpt(this.names, "delimiter", "names-delimiter");
     //SNIP-START
     if (this.debug) {
         print("(13)");
@@ -289,7 +291,8 @@ CSL.NameOutput.prototype.outputNames = function () {
         print("(16)");
     }
     //SNIP-END
-    this.state.output.append(blob, this.names);
+    var namesToken = CSL.Util.cloneToken(this.names);
+    this.state.output.append(blob, namesToken);
     if (this.state.tmp.term_predecessor_name) {
         this.state.tmp.term_predecessor = true;
     }

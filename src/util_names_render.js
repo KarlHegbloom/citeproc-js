@@ -41,7 +41,7 @@ CSL.NameOutput.prototype.renderInstitutionNames = function () {
             var j, ret, optLangTag, jlen, key, localesets;
             if (this.state.tmp.extension) {
                 localesets = ["sort"];
-            } else if (name.isInstitution) {
+            } else if (name.isInstitution || name.literal) {
                 // Will never hit this in this function, but preserving
                 // in case we factor this out.
                 localesets = this.state.opt['cite-lang-prefs'].institutions;
@@ -140,11 +140,11 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         // No multilingual for pure short form institution names.
         if (primary["short"].length) {
             short_style = this._getShortStyle();
-            institution = [this._composeOneInstitutionPart([n.s.pri, n.s.sec, n.s.ter], slot, short_style)];
+            institution = [this._composeOneInstitutionPart([n.s.pri, n.s.sec, n.s.ter], slot, short_style, v)];
         } else {
             // Fail over to long.
             long_style = this._getLongStyle(primary, v, j);
-            institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style)];
+            institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, v)];
         }
         break;
     case "short-long":
@@ -152,7 +152,7 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         short_style = this._getShortStyle();
         institution_short = this._renderOneInstitutionPart(primary["short"], short_style);
         // true is to include multilingual supplement
-        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style);
+        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, v);
         institution = [institution_short, institution_long];
         break;
     case "long-short":
@@ -160,23 +160,38 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         short_style = this._getShortStyle();
         institution_short = this._renderOneInstitutionPart(primary["short"], short_style);
         // true is to include multilingual supplement
-        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, true);
+        institution_long = this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, v);
         institution = [institution_long, institution_short];
         break;
     default:
         long_style = this._getLongStyle(primary, v, j);
         // true is to include multilingual supplement
-        institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style)];
+        institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, v)];
         break;
     }
     return this._join(institution, " ");
 };
 
-CSL.NameOutput.prototype._composeOneInstitutionPart = function (names, slot, style) {
-    var primary = false, secondary = false, tertiary = false;
+CSL.NameOutput.prototype._composeOneInstitutionPart = function (names, slot, style, v) {
+    var primary = false, secondary = false, tertiary = false, primary_tok, secondary_tok, tertiary_tok;
     if (names[0]) {
-        primary = this._renderOneInstitutionPart(names[0], style);
-    }
+        primary_tok = CSL.Util.cloneToken(style);
+        if (this.state.opt.citeAffixes[slot.primary]){
+            if ("<i>" === this.state.opt.citeAffixes.institutions[slot.primary].prefix) {
+                var hasItalic = false;
+                for (var i = 0, ilen = primary_tok.decorations.length; i < ilen; i += 1) {
+                    if (style.decorations[i][0] === "@font-style"
+                        && primary_tok.decorations[i][1] === "italic") {
+                        hasItalic = true;
+                    }
+                }
+                if (!hasItalic) {
+                    primary_tok.decorations.push(["@font-style", "italic"])
+                }
+            }
+        }
+        primary = this._renderOneInstitutionPart(names[0], primary_tok);
+     }
     if (names[1]) {
         secondary = this._renderOneInstitutionPart(names[1], style);
     }
@@ -260,7 +275,7 @@ CSL.NameOutput.prototype._renderOneInstitutionPart = function (blobs, style) {
         }
     }
     if ("undefined" === typeof this.institution.strings["part-separator"]) {
-        this.institution.strings["part-separator"] = this.name.strings.delimiter;
+        this.institution.strings["part-separator"] = this.state.tmp.name_delimiter;
     }
     return this._join(blobs, this.institution.strings["part-separator"]);
 };
@@ -279,7 +294,7 @@ CSL.NameOutput.prototype._renderNames = function (v, values, pos, j) {
             
             if (this.state.tmp.extension) {
                 localesets = ["sort"];
-            } else if (name.isInstitution) {
+            } else if (name.isInstitution || name.literal) {
                 // Will never hit this in this function, but preserving
                 // in case we factor this out.
                 localesets = this.state.opt['cite-lang-prefs'].institutions;
@@ -313,7 +328,8 @@ CSL.NameOutput.prototype._renderNames = function (v, values, pos, j) {
 
             if (!name.literal && !name.isInstitution) {
                 var nameBlob = this._renderPersonalName(v, name, slot, pos, i, j);
-                this.state.output.append(nameBlob, this.name, true);
+                var nameToken = CSL.Util.cloneToken(this.name);
+                this.state.output.append(nameBlob, nameToken, true);
                 names.push(this.state.output.pop());
             } else {
                 names.push(this._renderInstitutionName(v, name, slot, j));
@@ -421,7 +437,7 @@ CSL.NameOutput.prototype._renderOnePersonalName = function (value, pos, i, j) {
         given = false;
         suffix = false;
     }
-    var sort_sep = this.name.strings["sort-separator"];
+    var sort_sep = this.state.inheritOpt(this.name, "sort-separator");
     if (!sort_sep) {
         sort_sep = "";
     }
@@ -452,7 +468,7 @@ CSL.NameOutput.prototype._renderOnePersonalName = function (value, pos, i, j) {
             merged = this._join([family, second], this.state.opt.sort_sep);
             blob = this._join([merged, suffix], " ");
         }
-    } else if (this.name.strings["name-as-sort-order"] === "all" || (this.name.strings["name-as-sort-order"] === "first" && i === 0 && (j === 0 || "undefined" === typeof j))) {
+    } else if (this.state.inheritOpt(this.name, "name-as-sort-order") === "all" || (this.state.inheritOpt(this.name, "name-as-sort-order") === "first" && i === 0 && (j === 0 || "undefined" === typeof j))) {
         //
         // Discretionary sort ordering and inversions
         //
@@ -530,8 +546,8 @@ CSL.NameOutput.prototype._renderOnePersonalName = function (value, pos, i, j) {
         }
 
         var space = " ";
-        if (this.name.strings["initialize-with"]
-            && this.name.strings["initialize-with"].match(/[\u00a0\ufeff]/)
+        if (this.state.inheritOpt(this.name, "initialize-with")
+            && this.state.inheritOpt(this.name, "initialize-with").match(/[\u00a0\ufeff]/)
             && ["fr", "ru", "cs"].indexOf(this.state.opt["default-locale"][0].slice(0, 2)) > -1) {
             space = "\u00a0"
         }
@@ -644,7 +660,7 @@ CSL.NameOutput.prototype._droppingParticle = function (name, pos, j) {
     }
     var str = this._stripPeriods("given", dp);
     if (name["dropping-particle"] && name["dropping-particle"].match(/^et.?al[^a-z]$/)) {
-        if (this.name.strings["et-al-use-last"]) {
+        if (this.state.inheritOpt(this.name, "et-al-use-last")) {
             if ("undefined" === typeof j) { 
                 this.etal_spec[pos].freeters = 2;
             } else {
@@ -674,14 +690,14 @@ CSL.NameOutput.prototype._familyName = function (name) {
 
 CSL.NameOutput.prototype._givenName = function (name, pos, i) {
 
-    if (this.name.strings.initialize === false) {
-        if (name.family && name.given && this.name.strings.initialize === false) {
-            name.given = CSL.Util.Names.initializeWith(this.state, name.given, this.name.strings["initialize-with"], true);
+    if (this.state.inheritOpt(this.name, "initialize") === false) {
+        if (name.family && name.given && this.state.inheritOpt(this.name, "initialize") === false) {
+            name.given = CSL.Util.Names.initializeWith(this.state, name.given, this.state.inheritOpt(this.name, "initialize-with"), true);
         }
         name.given = CSL.Util.Names.unInitialize(this.state, name.given);
     } else {
         if (name.family && 1 === this.state.tmp.disambig_settings.givens[pos][i] && !name.block_initialize) {
-            var initialize_with = this.name.strings["initialize-with"];
+            var initialize_with = this.state.inheritOpt(this.name, "initialize-with");
             name.given = CSL.Util.Names.initializeWith(this.state, name.given, initialize_with);
         } else {
             name.given = CSL.Util.Names.unInitialize(this.state, name.given);
@@ -701,8 +717,8 @@ CSL.NameOutput.prototype._nameSuffix = function (name) {
 
     var str = name.suffix;
 
-    if ("string" === typeof this.name.strings["initialize-with"]) {
-        str = CSL.Util.Names.initializeWith(this.state, name.suffix, this.name.strings["initialize-with"], true);
+    if ("string" === typeof this.state.inheritOpt(this.name, "initialize-with")) {
+        str = CSL.Util.Names.initializeWith(this.state, name.suffix, this.state.inheritOpt(this.name, "initialize-with"), true);
     }
 
     str = this._stripPeriods("family", str);

@@ -52,6 +52,8 @@ CSL.Node.sort = {
                     state.opt.lang = state.tmp.lang_sort_hold;
                     delete state.tmp.lang_sort_hold;
                 }
+                //state.tmp.area = state.tmp.root;
+                //state.tmp.extension = "";
             }
             this.execs.push(func);
             /*

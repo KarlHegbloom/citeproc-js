@@ -9,9 +9,9 @@ CSL.Node.names = {
         if (this.tokentype === CSL.START || this.tokentype === CSL.SINGLETON) {
             CSL.Util.substituteStart.call(this, state, target);
             state.build.substitute_level.push(1);
-            
+/*            
             state.fixOpt(this, "names-delimiter", "delimiter");
-
+*/
         }
         
         if (this.tokentype === CSL.SINGLETON) {
@@ -68,32 +68,6 @@ CSL.Node.names = {
             // The with term. This isn't the right place
             // for this, but it's all hard-wired at the
             // moment.
-            var mywith = "with";
-
-            var with_default_prefix = "";
-            var with_suffix = "";
-            if (CSL.STARTSWITH_ROMANESQUE_REGEXP.test(mywith)) {
-                with_default_prefix = " ";
-                with_suffix = " ";
-            }
-            this["with"] = {};
-            this["with"].single = new CSL.Blob(mywith);
-            this["with"].single.strings.suffix = with_suffix;
-            this["with"].multiple = new CSL.Blob(mywith);
-            this["with"].multiple.strings.suffix = with_suffix;
-            if (this.strings["delimiter-precedes-last"] === "always") {
-                this["with"].single.strings.prefix = this.strings.delimiter;
-                this["with"].multiple.strings.prefix = this.strings.delimiter;
-            } else if (this.strings["delimiter-precedes-last"] === "contextual") {
-                this["with"].single.strings.prefix = with_default_prefix;
-                this["with"].multiple.strings.prefix = this.strings.delimiter;
-            } else if (this.strings["delimiter-precedes-last"] === "after-inverted-name") {
-                this["with"].single.strings.prefix = this.strings.delimiter;
-                this["with"].multiple.strings.prefix = with_default_prefix;
-            } else {
-                this["with"].single.strings.prefix = with_default_prefix;
-                this["with"].multiple.strings.prefix = with_default_prefix;
-            }
 
             // "and" and "ellipsis" are set in node_name.js
             func = function (state, Item, item) {
@@ -135,6 +109,35 @@ CSL.Node.names = {
                     state.nameOutput[key] = this[key];
                 }
                 state.nameOutput["with"] = this["with"];
+
+                // REMOVE THIS
+                var mywith = "with";
+                var with_default_prefix = "";
+                var with_suffix = "";
+                if (CSL.STARTSWITH_ROMANESQUE_REGEXP.test(mywith)) {
+                    with_default_prefix = " ";
+                    with_suffix = " ";
+                }
+                var thewith = {};
+                thewith.single = new CSL.Blob(mywith);
+                thewith.single.strings.suffix = with_suffix;
+                thewith.multiple = new CSL.Blob(mywith);
+                thewith.multiple.strings.suffix = with_suffix;
+                if (state.inheritOpt(state.nameOutput.name, "delimiter-precedes-last") === "always") {
+                    thewith.single.strings.prefix = state.inheritOpt(this, "delimiter", "names-delimiter");
+                    thewith.multiple.strings.prefix = state.inheritOpt(this, "delimiter", "names-delimiter");
+                } else if (state.inheritOpt(state.nameOutput.name, "delimiter-precedes-last") === "contextual") {
+                    thewith.single.strings.prefix = with_default_prefix;
+                    thewith.multiple.strings.prefix = state.inheritOpt(this, "delimiter", "names-delimiter");
+                } else if (state.inheritOpt(state.nameOutput.name, "delimiter-precedes-last") === "after-inverted-name") {
+                    thewith.single.strings.prefix = state.inheritOpt(this, "delimiter", "names-delimiter");
+                    thewith.multiple.strings.prefix = with_default_prefix;
+                } else {
+                    thewith.single.strings.prefix = with_default_prefix;
+                    thewith.multiple.strings.prefix = with_default_prefix;
+                }
+                state.nameOutput["with"] = thewith;
+
 
                 // XXX label style should be set per variable, since they may differ
                 // XXX with full-form nested names constructs

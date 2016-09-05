@@ -395,7 +395,15 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
             }
         } else if (blobjr.blobs.length) {
             var addtoret = state.output.string(state, blobjr.blobs, blobjr);
-            //ret.push(addtoret);
+            // Hack in the delimiter string on strings that follow numeric objects within a group.
+            if (blob) {
+                if (addtoret.length > 1
+                    && "string" === typeof addtoret.slice(-1)[0]
+                    && "string" !== typeof addtoret.slice(-2)[0]) {
+                    
+                    addtoret[addtoret.length-1] = (blobjr.strings.delimiter + addtoret.slice(-1)[0]);
+                }
+            }
             ret = ret.concat(addtoret);
         }
         if (blobjr.strings.first_blob) {
@@ -516,6 +524,9 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
     if (blob && blob.new_locale) {
         state.opt.lang = blob.old_locale;
     }
+    //if (!blob && !state.tmp.just_looking) {
+    //  print("QUEUE ("+ state.tmp.just_looking +"): "+JSON.stringify(state.output.queue, ["num", "strings", "decorations", "blobs", "prefix", "suffix", "delimiter"], 2));
+    //}
     return ret;
 };
 

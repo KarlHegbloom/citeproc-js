@@ -5,7 +5,7 @@ citation
 
 
 >>===== RESULT =====>>
-..[0] From module: MY CASE TITLE
+..[0] From module: Frank MY CASE TITLE
 >>[1] From module: MY STATUTE TITLE
 <<===== RESULT =====<<
 
@@ -52,10 +52,11 @@ citation
 
 
 >>===== CSL =====>>
-<style 
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.1mlz1" page-range-format="chicago">
+<!-- style 
       xmlns="http://purl.org/net/xbiblio/csl"
       class="note"
-      version="1.1mlz1">
+      version="1.1mlz1" -->
   <info>
     <title>Test fixture</title>
     <id>http://citationstyles.org/tests/fixture</id>
@@ -109,11 +110,23 @@ citation
     <text value=""/>
   </macro>
 
-  <citation>
+  <citation name-form="short">
     <layout delimiter="; ">
-      <text macro="juris-title"/>
+      <group delimiter=" ">
+        <text macro="juris-title"/>
+      </group>
     </layout>
   </citation>
+  <bibliography initialize-with=". ">
+    <sort>
+     <key variable="author"/>
+    </sort>
+    <layout>
+      <group delimiter=" ">
+        <text macro="juris-title"/>
+      </group>
+    </layout>
+  </bibliography>
 </style>
 <<===== CSL =====<<
 
@@ -124,7 +137,13 @@ citation
         "id": "ITEM-1", 
         "jurisdiction": "us:ak",
         "title": "My Case Title",
-        "type": "legal_case"
+        "type": "legal_case",
+        "author": [
+            {
+               "family": "Frank",
+               "given": "Bennett"
+            }
+        ]
     },
    {
         "id": "ITEM-2", 

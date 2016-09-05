@@ -1,14 +1,13 @@
 /*global CSL: true */
 
 CSL.NameOutput.prototype.joinPersons = function (blobs, pos, j, tokenname) {
-
     var ret;
     if (!tokenname) {
         tokenname = "name";
     }
     if ("undefined" === typeof j) {
         if (this.etal_spec[pos].freeters === 1) {
-            ret = this._joinEtAl(blobs, tokenname);
+           ret = this._joinEtAl(blobs, tokenname);
         } else if (this.etal_spec[pos].freeters === 2) {
             ret = this._joinEllipsis(blobs, tokenname);
         } else if (!this.state.tmp.sort_key_flag) {
@@ -46,19 +45,21 @@ CSL.NameOutput.prototype.joinInstitutionSets = function (blobs, pos) {
 
 CSL.NameOutput.prototype.joinPersonsAndInstitutions = function (blobs) {
     //
-    return this._join(blobs, this.name.strings.delimiter);
+    return this._join(blobs, this.state.tmp.name_delimiter);
 };
 
+// LEGACY
+// This should go away eventually
 CSL.NameOutput.prototype.joinFreetersAndInstitutionSets = function (blobs) {
     // Nothing, one or two, never more
     var ret = this._join(blobs, "[never here]", this["with"].single, this["with"].multiple);
+    //var ret = this._join(blobs, "");
     return ret;
 };
 
-
 CSL.NameOutput.prototype._joinEtAl = function (blobs, tokenname) {
     //
-    var blob = this._join(blobs, this.name.strings.delimiter);
+    var blob = this._join(blobs, this.state.tmp.name_delimiter);
     
     // notSerious
     this.state.output.openLevel(this._getToken(tokenname));
@@ -77,12 +78,12 @@ CSL.NameOutput.prototype._joinEtAl = function (blobs, tokenname) {
 
 
 CSL.NameOutput.prototype._joinEllipsis = function (blobs, tokenname) {
-    return this._join(blobs, this.name.strings.delimiter, this.name.ellipsis.single, this.name.ellipsis.multiple, tokenname);
+    return this._join(blobs, this.state.tmp.name_delimiter, this.name.ellipsis.single, this.name.ellipsis.multiple, tokenname);
 };
 
 
 CSL.NameOutput.prototype._joinAnd = function (blobs, tokenname) {
-    return this._join(blobs, this[tokenname].strings.delimiter, this[tokenname].and.single, this[tokenname].and.multiple, tokenname);
+    return this._join(blobs, this.state.inheritOpt(this[tokenname], "delimiter", (tokenname + "-delimiter"), ", "), this[tokenname].and.single, this[tokenname].and.multiple, tokenname);
 };
 
 
