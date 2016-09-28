@@ -367,6 +367,7 @@ CSL.Attributes["@variable"] = function (state, arg) {
                         && state.tmp.area === "bibliography"
                         && "string" === typeof Item[variable]) {
 
+                        state.tmp.name_node.top = state.output.current.value();
                         state.tmp.rendered_name.push(Item[variable]);
                     }
                 }

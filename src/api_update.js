@@ -145,14 +145,17 @@ CSL.Engine.prototype.restoreProcessorState = function (citations) {
 };
 
 
-CSL.Engine.prototype.updateItems = function (idList, nosort, rerun_ambigs) {
+CSL.Engine.prototype.updateItems = function (idList, nosort, rerun_ambigs, implicitUpdate) {
     var debug = false;
     var oldArea = this.tmp.area;
     var oldRoot = this.tmp.root;
     var oldExtension = this.tmp.extension;
     this.tmp.area = "citation";
-    this.tmp.root = "citation"
-    this.tmp.extension = ""
+    this.tmp.root = "citation";
+    this.tmp.extension = "";
+    if (!implicitUpdate) {
+        this.tmp.loadedItemIDs = {};
+    }
     //CSL.debug = print
     //SNIP-START
     if (debug) {
@@ -243,6 +246,7 @@ CSL.Engine.prototype.updateUncitedItems = function (idList, nosort) {
     this.tmp.area = "citation";
     this.tmp.root = "citation"
     this.tmp.extension = ""
+    this.tmp.loadedItemIDs = {};
     // This should be a utility function
     if (!idList) {
         idList = [];

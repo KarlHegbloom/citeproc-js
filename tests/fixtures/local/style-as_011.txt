@@ -356,7 +356,7 @@ bibliography
         "multi": {
             "_keys": {}
         }, 
-        "note": "{:number-of-pages: 5} {:number: USGS Open-File Report 2007–1047, Short Research Paper 102}", 
+        "note": "100 xxx\n{:number-of-pages: 5} {:number: USGS Open-File Report 2007–1047, Short Research Paper 102}", 
         "shortTitle": "Triassic-Jurassic sediments and multiple volcanic events in North Victoria Land, Antarctica", 
         "title": "Triassic-Jurassic sediments and multiple volcanic events in North Victoria Land, Antarctica: A revised stratigraphic model", 
         "type": "paper-conference"

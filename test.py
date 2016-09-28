@@ -117,7 +117,7 @@ class Bundle:
         f.extend(["xmljson","xmldom","xmle4xLoad","system","sort","util_disambig","util_nodes","util_dateparser","build"]);
         f.extend(["util_static_locator","util_processor","util_citationlabel","api_control"]);
         f.extend(["queue","state","api_cite","api_bibliography","util_integration","api_update"]);
-        f.extend(["util_locale","node_bibliography","node_choose","node_citation","node_comment"]);
+        f.extend(["util_locale","util_locale_sniff","node_bibliography","node_choose","node_citation","node_comment"]);
         f.extend(["node_date","node_datepart","node_elseif","node_else","node_etal","node_group"]);
         f.extend(["node_if","node_conditions","node_condition","util_conditions","node_info"]);
         f.extend(["node_institution","node_institutionpart","node_key"]);

@@ -62,6 +62,7 @@ CSL.Registry = function (state) {
     this.state = state;
     this.registry = {};
     this.reflist = [];
+    this.refhash = {};
     this.namereg = new CSL.Registry.NameReg(state);
     this.citationreg = new CSL.Registry.CitationReg(state);
     // See CSL.NameOutput.prototype.outputNames
@@ -316,6 +317,7 @@ CSL.Registry.prototype.dodeletes = function (myhash) {
             //  3d. Delete all items in deletion list from hash.
             //
             delete this.registry[key];
+            delete this.refhash[key];
 
             // For processCitationCluster()
             this.return_data.bibchange = true;

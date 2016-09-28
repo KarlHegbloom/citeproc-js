@@ -140,6 +140,7 @@ CSL.Engine.Opt = function () {
 
     this.development_extensions = {};
     this.development_extensions.field_hack = true;
+    this.development_extensions.allow_field_hack_date_override = true;
     this.development_extensions.locator_date_and_revision = true;
     this.development_extensions.locator_parsing_for_plurals = true;
     this.development_extensions.locator_label_parse = true;
@@ -245,6 +246,11 @@ CSL.Engine.Tmp = function () {
     // false.
     this.term_predecessor = false;
     //
+    // boolean flag to control use of layout delimiter
+    // immediately before numbers. This hack is needed for
+    // some numeric styles.
+    this.in_cite_predecessor = false;
+    //
     // stack flag used to control jumps in the closing
     // token of a conditional.
     this.jump = new CSL.Stack(0, CSL.LITERAL);
@@ -320,6 +326,7 @@ CSL.Engine.Tmp = function () {
     this.strip_periods = 0;
     this.shadow_numbers = {};
     this.authority_stop_last = 0;
+    this.loadedItemIDs = {};
 };
 
 

@@ -14,18 +14,25 @@ CSL.Engine.prototype.retrieveAllStyleModules = function (jurisdictionList) {
     var ret = {};
     var preferences = this.locale[this.opt.lang].opts["jurisdiction-preference"];
     preferences = preferences ? preferences : [];
-    preferences = [null].concat(preferences);
+    preferences = [""].concat(preferences);
     for (var i=preferences.length-1;i>-1;i--) {
         var preference = preferences[i];
         for (var j=0,jlen=jurisdictionList.length;j<jlen;j++) {
             var jurisdiction = jurisdictionList[j];
-            // Skip jurisdictions we already have on file.
+            // If we've "seen" it, we have it already, or we're not going to get it.
             if (this.opt.jurisdictions_seen[jurisdiction]) continue;
+            // Try to get the module
             var res = this.sys.retrieveStyleModule(jurisdiction, preference);
-            this.opt.jurisdictions_seen[jurisdiction] = true;
+            // If we fail and we've run out of preferences, mark as "seen"
+            // Otherwise mark as "seen" if we get something.
+            if ((!res && !preference) || res) {
+                this.opt.jurisdictions_seen[jurisdiction] = true;
+            }
+            // Don't memo unless get got style code.
             if (!res) continue;
             ret[jurisdiction] = res;
         }
     }
+    // Give 'em what we got.
     return ret;
 }

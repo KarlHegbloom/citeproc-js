@@ -33,7 +33,7 @@
 
 var CSL = {
 
-    PROCESSOR_VERSION: "1.1.117",
+    PROCESSOR_VERSION: "1.1.136",
 
     CONDITION_LEVEL_TOP: 1,
 
@@ -253,54 +253,82 @@ var CSL = {
         return lst.join("-");
     },
     
-    parseNoteFieldHacks: function(Item, validFieldsForType) {
+    parseNoteFieldHacks: function(Item, allowDateOverride) {
         if ("string" !== typeof Item.note) return;
         var elems = [];
-        var m = Item.note.match(CSL.NOTE_FIELDS_REGEXP);
-        if (m) {
-            var splt = Item.note.split(CSL.NOTE_FIELDS_REGEXP);
-            for (var i=0,ilen=(splt.length-1);i<ilen;i++) {
-                elems.push(splt[i]);
-                elems.push(m[i]);
-            }
-            elems.push(splt[splt.length-1])
-            var names = {};
-            for (var i=1,ilen=elems.length;i<ilen;i+=2) {
-                var mm = elems[i].match(CSL.NOTE_FIELD_REGEXP);
-                var key = mm[1];
-                var val = mm[2].replace(/^\s+/, "").replace(/\s+$/, "");
-                if (!Item[key]) {
-                    if (!validFieldsForType || validFieldsForType[key]) {
-                        if (CSL.DATE_VARIABLES.indexOf(key) > -1) {
-                            Item[key] = {raw: val};
-                            elems[i] = "";
-                        } else {
-                            Item[key] = val;
-                        }
-                    } else if (CSL.NAME_VARIABLES.indexOf(key) > -1) {
-                        if (!names[key]) {
-                            names[key] = [];
-                        }
-                        var lst = val.split(/\s*\|\|\s*/);
-                        if (lst.length === 1) {
-                            names[key].push({literal:lst[0]});
-                        } else if (lst.length === 2) {
-                            var name = {family:lst[0],given:lst[1]};
-                            CSL.parseParticles(name);
-                            names[key].push(name);
-                        }
-                        elems[i] = "";
+        var lines = Item.note.split('\n');
+        var lastline = "";
+        // Normalize entries
+        for (var i=0, ilen=lines.length; i<ilen; i++) {
+            var line = lines[i];
+            var elems = [];
+            var m = line.match(CSL.NOTE_FIELDS_REGEXP);
+            if (m) {
+                var splt = line.split(CSL.NOTE_FIELDS_REGEXP);
+                for (var j=0,jlen=(splt.length-1);j<jlen;j++) {
+                    elems.push(splt[j]);
+                    elems.push(m[j]);
+                }
+                elems.push(splt[splt.length-1])
+                for (var j=1,jlen=elems.length;j<jlen;j += 2) {
+                    // Abort conversions if preceded by unparseable text
+                    if (elems[j-1].trim() && (i>0 || j>1) && !elems[j-1].match(CSL.NOTE_FIELD_REGEXP)) {
+                        break
+                    } else {
+                        elems[j] = '\n' + elems[j].slice(2,-1).trim() + '\n';
                     }
                 }
-                if (name === "type") {
-                    Item.type = val;
-                }
-                Item.note = elems.join("");
-            }
-            for (var key in names) {
-                Item[key] = names[key];
+                lines[i] = elems.join('');
             }
         }
+        // Resplit
+        lines = lines.join('\n').split('\n');
+        var names = {};
+        for (var i=0,ilen=lines.length;i<ilen;i++) {
+            var line = lines[i];
+            var mm = line.match(CSL.NOTE_FIELD_REGEXP);
+            if (!line.trim()) {
+                continue;
+            } else if (!mm) {
+                if (i === 0) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            var key = mm[1];
+            var val = mm[2].replace(/^\s+/, "").replace(/\s+$/, "");
+            if (key === "type") {
+                Item.type = val;
+                lines[i] = "";
+            } else if (CSL.DATE_VARIABLES.indexOf(key) > -1) {
+                if (allowDateOverride) {
+                    Item[key] = {raw: val};
+                    lines[i] = "";
+                }
+            } else if (!Item[key]) {
+                if (CSL.NAME_VARIABLES.indexOf(key) > -1) {
+                    if (!names[key]) {
+                        names[key] = [];
+                    }
+                    var lst = val.split(/\s*\|\|\s*/);
+                    if (lst.length === 1) {
+                        names[key].push({literal:lst[0]});
+                    } else if (lst.length === 2) {
+                        var name = {family:lst[0],given:lst[1]};
+                        CSL.parseParticles(name);
+                        names[key].push(name);
+                    }
+                } else {
+                    Item[key] = val;
+                }
+                lines[i] = "";
+            }
+        }
+        for (var key in names) {
+            Item[key] = names[key];
+        }
+        Item.note = lines.join("").trim();
     },
 
     GENDERS: ["masculine", "feminine"],
@@ -437,7 +465,7 @@ var CSL = {
     VIETNAMESE_NAMES: /^(?:(?:[.AaBbCcDdEeGgHhIiKkLlMmNnOoPpQqRrSsTtUuVvXxYy \u00c0-\u00c3\u00c8-\u00ca\u00cc\u00cd\u00d2-\u00d5\u00d9\u00da\u00dd\u00e0-\u00e3\u00e8-\u00ea\u00ec\u00ed\u00f2-\u00f5\u00f9\u00fa\u00fd\u0101\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01a0\u01a1\u01af\u01b0\u1ea0-\u1ef9]{2,6})(\s+|$))+$/,
 
     NOTE_FIELDS_REGEXP: /\{:(?:[\-_a-z]+|[A-Z]+):[^\}]+\}/g,
-    NOTE_FIELD_REGEXP: /\{:([\-_a-z]+|[A-Z]+):\s*([^\}]+)\}/,
+    NOTE_FIELD_REGEXP: /^([\-_a-z]+|[A-Z]+):\s*([^\}]+)$/,
 
     DISPLAY_CLASSES: ["block", "left-margin", "right-inline", "indent"],
 
@@ -892,7 +920,6 @@ var CSL = {
 // For citeproc-node
 if (typeof require !== "undefined" && typeof module !== 'undefined' && "exports" in module) {
     var CSL_IS_NODEJS = true;
-    var CSL_NODEJS = require("./csl_nodejs_jsdom").CSL_NODEJS_JSDOM;
     exports.CSL = CSL;
 }
 

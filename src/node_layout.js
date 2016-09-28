@@ -78,7 +78,6 @@ CSL.Node.layout = {
                 }
                 //CSL.debug(" === init rendered_name === ");
                 state.tmp.rendered_name = false;
-                state.tmp.name_node = {};
             };
             this.execs.push(func);
             // set opt delimiter

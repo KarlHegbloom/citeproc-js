@@ -1,6 +1,158 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.136
+==========================
+
+- Permit non-conforming entries on the first line of "note" when
+  parsing "cheater syntax."
+
+==========================
+Changes in version 1.1.135
+==========================
+
+- Fix further bugs and infelicities in "cheater syntax" code. Main issues
+  are here:
+
+    https://github.com/Juris-M/citeproc-js/issues/6
+    https://github.com/zotero/zotero/issues/846
+
+- Update documentation on "cheater syntax" and related options:
+
+    http://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html#cheater-syntax-for-odd-fields
+
+==========================
+Changes in version 1.1.134
+==========================
+
+- Fix bug in placeholder label handling that blocked rendering
+  for ordinary numbers (edition, volume, etc).
+
+==========================
+Changes in version 1.1.133
+==========================
+
+- Fix bugs in new cheater-syntax code.
+
+==========================
+Changes in version 1.1.132
+==========================
+
+- Fix breakage in note-field "cheater syntax," and recognize simpler
+  line-entry syntax in addition to existing braced-entry syntax.
+  Breakage is described here:
+
+  https://github.com/Juris-M/citeproc-js/issues/6
+
+  Details of "cheater syntax" are documented here:
+
+  http://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html#cheater-syntax-for-odd-fields
+
+==========================
+Changes in version 1.1.131
+==========================
+
+- Reverse citation dereference from 1.1.127.
+
+==========================
+Changes in version 1.1.130
+==========================
+
+- Further fix for "no." label on number variable:
+
+  * Force literal rendering following a non-numeric entity
+  * Call "number" term when "no." short-code is used in "number"
+    variable only, but falling back to "issue" label if "number" 
+    locale term is empty or undefined.
+
+==========================
+Changes in version 1.1.129
+==========================
+
+- Fix dropped-labels bug reported here:
+
+  https://forums.zotero.org/discussion/62437/citation-style-bug-with-report-number
+
+==========================
+Changes in version 1.1.128
+==========================
+
+- Fix delimiter bug reported here:
+
+  https://forums.zotero.org/discussion/62352/style-error-american-fisheries-society
+
+==========================
+Changes in version 1.1.127
+==========================
+
+- Dereference citation and Item when first encountered during
+  a processor run. Avoids side effects in code of the calling
+  application, particularly in async environments.
+
+==========================
+Changes in version 1.1.126
+==========================
+
+- Fix bug affecting numeric styles, identified by 
+  Derek Sifford (dsifford):
+
+  https://github.com/Juris-M/citeproc-js/issues/17
+
+==========================
+Changes in version 1.1.125
+==========================
+
+- Add synchronous function CSL.getLocaleNames() to return a list of valid
+  CSL locale IDs appropriate for a given style.
+
+==========================
+Changes in version 1.1.124
+==========================
+
+- Remove dependency on jsdom in node deployments.
+
+==========================
+Changes in version 1.1.123
+==========================
+
+- Implement month-day date constraint.
+
+==========================
+Changes in version 1.1.122
+==========================
+
+- Restore jurisdiction suppression.
+
+==========================
+Changes in version 1.1.121
+==========================
+
+- Fix style module inheritance.
+
+==========================
+Changes in version 1.1.120
+==========================
+
+- Fix subsequent-author-substitute. Bug reported here:
+
+  https://forums.zotero.org/discussion/comment/260518
+
+==========================
+Changes in version 1.1.119
+==========================
+
+- Fix delimiter bug affecting some numeric styles:
+
+  https://forums.zotero.org/discussion/62288/citeprocjs-bug/
+
+==========================
+Changes in version 1.1.118
+==========================
+
+- Never render secondary or tertiary variants of title-short variable,
+  even when requested.
+
+==========================
 Changes in version 1.1.117
 ==========================
 

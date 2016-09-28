@@ -121,6 +121,27 @@ CSL.Util.fixDateNode = function (parent, pos, node) {
         // Xml: Find one node by attribute and delete
         //
         this.cslXml.deleteNodeByNameAttribute(datexml, 'day');
+    } else if ("month-day" === this.cslXml.getAttributeValue(node, "date-parts")) {
+        //
+        // Xml: Get child nodes
+        //
+        var childNodes = this.cslXml.children(datexml);
+        for (var i=1,ilen=childNodes.length;i<ilen;i++) {
+            //
+            // Xml: Get attribute value (for string comparison)
+            //
+            if (this.cslXml.getAttributeValue(childNodes[i], 'name') === "year") {
+                //
+                // Xml: Set attribute value
+                //
+                this.cslXml.setAttribute(childNodes[i-1], "suffix", "");
+                break;
+            }
+        }
+        //
+        // Xml: Find one node by attribute and delete
+        //
+        this.cslXml.deleteNodeByNameAttribute(datexml, 'year');
     }
     return this.cslXml.insertChildNodeAfter(parent, node, pos, datexml);
 };

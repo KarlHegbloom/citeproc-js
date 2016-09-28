@@ -28,10 +28,12 @@ CSL.Engine.prototype.appendCitationCluster = function (citation) {
 CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, citationsPost, flag) {
     var c, i, ilen, j, jlen, k, klen, n, nlen, key, Item, item, noteCitations, textCitations, m, citationsInNote;
     this.debug = false;
+    this.tmp.loadedItemIDs = {};
+    
+    // Revert citation dereference from 2ffc4664ae
+    //citation = JSON.parse(JSON.stringify(citation));
+    
     //print("################### processCitationCluster() #################");
-    //SNIP-START
-    // this.dumpCslCitation(citation, flag);
-    //SNIP-END
     this.tmp.citation_errors = [];
     var return_data = {"bibchange": false};
 
@@ -225,7 +227,8 @@ CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, 
             CSL.debug("****** start update items *********");
         }
         //SNIP-END
-        this.updateItems(update_items);
+        // true signals implicit updateItems (will not rerun sys.retrieveItem())
+        this.updateItems(update_items, null, null, true);
         //SNIP-START
         if (this.debug) {
             CSL.debug("****** endo update items *********");
@@ -638,7 +641,7 @@ CSL.Engine.prototype.processCitationCluster = function (citation, citationsPre, 
         for (i = 0, ilen = oldItemList.length; i < ilen; i += 1) {
             oldItemIds.push("" + oldItemList[i].id);
         }
-        this.updateItems(oldItemIds);
+        this.updateItems(oldItemIds, null, null, true);
         //SNIP-START
         if (this.debug) {
             CSL.debug("****** end final update *********");
@@ -996,6 +999,7 @@ CSL.getCitationCluster = function (inputList, citationID) {
             this.output = output;
         }
 
+        this.tmp.in_cite_predecessor = false;
         // true is to block reset of shadow numbers
         if (pos > 0) {
             CSL.getCite.call(this, Item, item, "" + inputList[(pos - 1)][0].id, true);
@@ -1264,6 +1268,7 @@ CSL.getCite = function (Item, item, prevItemID, blockShadowNumberReset) {
     this.parallel.StartCite(Item, item, prevItemID);
     CSL.citeStart.call(this, Item, item, blockShadowNumberReset);
     next = 0;
+    this.tmp.name_node = {};
     this.nameOutput = new CSL.NameOutput(this, Item, item);
 
     // rerun?
