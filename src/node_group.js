@@ -190,9 +190,10 @@ CSL.Node.group = {
                                     state.buildTokenLists(myNodes[i], state.juris[jurisdiction][myName]);
                                     state.configureTokenList(state.juris[jurisdiction][myName]);
                                 }
-                                if (macroCount < Object.keys(state.juris[jurisdiction].types).length) {
-                                    throw "CSL ERROR: Incomplete jurisdiction style module for: " + jurisdiction;
-                                }
+                                //if (macroCount < Object.keys(CSL.MODULE_MACROS).length) {
+                                //    var missing = [];
+                                //    throw "CSL ERROR: Incomplete jurisdiction style module for: " + jurisdiction;
+                                //}
                             }
                         }
                         // Identify the best jurisdiction for the item and return true, otherwise return false

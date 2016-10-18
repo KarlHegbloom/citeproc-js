@@ -33,7 +33,7 @@
 
 var CSL = {
 
-    PROCESSOR_VERSION: "1.1.136",
+    PROCESSOR_VERSION: "1.1.138",
 
     CONDITION_LEVEL_TOP: 1,
 
@@ -142,7 +142,8 @@ var CSL = {
         "hearing": true,
         "gazette": true,
         "report": true,
-        "regulation": true
+        "regulation": true,
+        "standard": true
     },
     NestedBraces: [
         ["(", "["],
@@ -253,7 +254,7 @@ var CSL = {
         return lst.join("-");
     },
     
-    parseNoteFieldHacks: function(Item, allowDateOverride) {
+    parseNoteFieldHacks: function(Item, validFieldsForType, allowDateOverride) {
         if ("string" !== typeof Item.note) return;
         var elems = [];
         var lines = Item.note.split('\n');
@@ -283,6 +284,7 @@ var CSL = {
         }
         // Resplit
         lines = lines.join('\n').split('\n');
+        var offset = 0;
         var names = {};
         for (var i=0,ilen=lines.length;i<ilen;i++) {
             var line = lines[i];
@@ -293,6 +295,7 @@ var CSL = {
                 if (i === 0) {
                     continue;
                 } else {
+                    offset = i;
                     break;
                 }
             }
@@ -304,7 +307,9 @@ var CSL = {
             } else if (CSL.DATE_VARIABLES.indexOf(key) > -1) {
                 if (allowDateOverride) {
                     Item[key] = {raw: val};
-                    lines[i] = "";
+                    if (!validFieldsForType || (validFieldsForType[key] && val.match(/^[0-9]{4}(?:-[0-9]{1,2}(?:-[0-9]{1,2})*)*$/))) {
+                        lines[i] = "";
+                    }
                 }
             } else if (!Item[key]) {
                 if (CSL.NAME_VARIABLES.indexOf(key) > -1) {
@@ -322,13 +327,26 @@ var CSL = {
                 } else {
                     Item[key] = val;
                 }
-                lines[i] = "";
+                if (!validFieldsForType || validFieldsForType[key]) {
+                    lines[i] = "";
+                }
             }
         }
         for (var key in names) {
             Item[key] = names[key];
         }
-        Item.note = lines.join("").trim();
+        // Final cleanup for validCslFields only: eliminate blank lines, add blank line to text
+        if (validFieldsForType) {
+            if (lines[offset].trim()) {
+                lines[offset] = '\n' + lines[offset]
+            }
+            for (var i=offset-1;i>-1;i--) {
+                if (!lines[i].trim()) {
+                    lines = lines.slice(0, i).concat(lines.slice(i + 1));
+                }
+            }
+        }
+        Item.note = lines.join("\n").trim();
     },
 
     GENDERS: ["masculine", "feminine"],

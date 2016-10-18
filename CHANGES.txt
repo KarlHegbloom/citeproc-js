@@ -1,6 +1,25 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.138
+==========================
+
+- Retain leading zeros on numeric fields, without clobbering
+  is-numeric test result. Thread:
+
+    https://forums.zotero.org/discussion/comment/263404#Comment_263404
+
+==========================
+Changes in version 1.1.137
+==========================
+
+- Restore validFieldsForType in parseNoteFieldHacks()
+
+- Recognize "standard" as a jurism module type.
+
+- Disable style module completeness check.
+
+==========================
 Changes in version 1.1.136
 ==========================
 

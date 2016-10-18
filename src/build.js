@@ -649,7 +649,8 @@ CSL.Engine.prototype.retrieveItem = function (id) {
     // Optional development extensions
     if (this.opt.development_extensions.field_hack && Item.note) {
         //Zotero.debug("XXX   (1): "+Item.note);
-        CSL.parseNoteFieldHacks(Item, this.opt.development_extensions.allow_field_hack_date_override);
+        // false is for validFieldsForType (all conforming entries scrubbed when false)
+        CSL.parseNoteFieldHacks(Item, false, this.opt.development_extensions.allow_field_hack_date_override);
     }
     // not including locator-date
     for (var i = 1, ilen = CSL.DATE_VARIABLES.length; i < ilen; i += 1) {
