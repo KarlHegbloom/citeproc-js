@@ -5468,10 +5468,11 @@ CSL.getCitationCluster = function (inputList, citationID) {
             if (this.tmp.has_purged_parallel) {
                 composite.push("");
             } else {
-                var errStr = "[CSL STYLE ERROR: reference with no printed form.]";
+                var errStr = "[CSL STYLE ERROR: reference with no printed form. (cite) itemID=" + error_object[itemID] + "]";
                 var preStr = pos === 0 ? txt_esc(this.citation.opt.layout_prefix) : "";
                 var sufStr = pos === (myblobs.length - 1) ? txt_esc(this.citation.opt.layout_suffix) : "";
                 composite.push(preStr + errStr + sufStr);
+                console.log("\n" + errStr + "\n");
             }
         }
         if (buffer.length && "string" === typeof composite[0]) {
@@ -5898,7 +5899,8 @@ CSL.getBibliographyEntries = function (bibsection) {
         }
         res = this.output.string(this, this.output.queue)[0];
         if (!res) {
-            res = "\n[CSL STYLE ERROR: reference with no printed form.]\n";
+            res = "\n[CSL STYLE ERROR: reference with no printed form. (bib) item.id=" + JSON.stringify(item.id) + "]\n";
+            console.log(res);
         }
         ret.push(res);
     }
