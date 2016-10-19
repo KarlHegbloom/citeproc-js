@@ -5722,10 +5722,12 @@ CSL.getCitationCluster = function (inputList, citationID) {
             if (this.tmp.has_purged_parallel) {
                 composite.push("");
             } else {
-                var errStr = "[CSL STYLE ERROR: reference with no printed form.]";
+                var errStr = "[CSL STYLE ERROR: reference with no printed form. (cite) itemID=" +
+                    error_object[itemID] + " citationID=" + error_object[citationID] + "]";
                 var preStr = pos === 0 ? txt_esc(this.citation.opt.layout_prefix) : "";
                 var sufStr = pos === (myblobs.length - 1) ? txt_esc(this.citation.opt.layout_suffix) : "";
                 composite.push(preStr + errStr + sufStr);
+                console.log("\n" + errStr + "\n");
             }
         }
         if (buffer.length && "string" === typeof composite[0]) {
