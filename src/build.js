@@ -769,25 +769,13 @@ CSL.Engine.prototype.setOpt = function (token, name, value) {
 
 // Executed at runtime, since macros can occur in the context of citation or bibliography
 CSL.Engine.prototype.inheritOpt = function (token, attrname, parentname, defaultValue) {
-    if (parentname === "name-form") {
-        //print("OK: " + token + " :: " + attrname + " :: " + parentname + " :: " + defaultValue);
-    }
     if ("undefined" !== typeof token.strings[attrname]) {
-        if (parentname === "name-form") {
-            //print("  (1)");
-        }
         return token.strings[attrname];
     } else {
         var parentValue = this[this.tmp.root].opt.inheritedAttributes[parentname ? parentname : attrname];
         if ("undefined" !== typeof parentValue) {
-            if (parentname === "name-form") {
-                //print("  (2) " + this.tmp.root + " " + parentValue);
-            }
             return parentValue;
         } else {
-            if (parentname === "name-form") {
-                //print("  (3) " + this.tmp.root + " " + defaultValue);
-            }
             return defaultValue;
         }
     }

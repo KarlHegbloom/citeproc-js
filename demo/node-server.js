@@ -11,7 +11,6 @@ var fs = require('fs');
 var filesToServe = [
     '/demo/demo.html',
     '/demo/local.css',
-    '/xmldom.js',
     '/citeproc.js',
     '/demo/demo.js',
     '/demo/citations.json',

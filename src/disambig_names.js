@@ -39,6 +39,7 @@ CSL.Registry.NameReg = function (state) {
 
     evalname = function (item_id, nameobj, namenum, request_base, form, initials) {
         var pos, len, items, param;
+        // XXX THIS CAN NO LONGER HAPPEN
         if (state.tmp.area.slice(0, 12) === "bibliography" && !form) {
             if ("string" === typeof initials) {
                 return 1;
