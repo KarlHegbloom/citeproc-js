@@ -8,6 +8,8 @@ bibliography
 <div class="csl-bib-body">
   <div class="csl-entry">John Doe, Jane Roe, John Snoakes</div>
   <div class="csl-entry">---, ---, Richard Noakes</div>
+  <div class="csl-entry">Doe Inc., Roe Inc., Snoakes Inc.</div>
+  <div class="csl-entry">---, ---, Noakes Inc.</div>
 </div>
 <<===== RESULT =====<<
 
@@ -76,6 +78,36 @@ bibliography
             }
         ], 
         "id": "ITEM-2", 
+        "type": "book"
+    }, 
+    {
+        "author": [
+            {
+                "literal": "Doe Inc."
+            }, 
+            {
+                "literal": "Roe Inc."
+            }, 
+            {
+                "literal": "Snoakes Inc."
+            }
+        ], 
+        "id": "ITEM-3", 
+        "type": "book"
+    }, 
+    {
+        "author": [
+            {
+                "literal": "Doe Inc."
+            }, 
+            {
+                "literal": "Roe Inc."
+            }, 
+            {
+                "literal": "Noakes Inc."
+            }
+        ], 
+        "id": "ITEM-4", 
         "type": "book"
     }
 ]

@@ -169,7 +169,9 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
         institution = [this._composeOneInstitutionPart([n.l.pri, n.l.sec, n.l.ter], slot, long_style, v)];
         break;
     }
-    return this._join(institution, " ");
+    var blob = this._join(institution, " ");
+    this.state.tmp.name_node.children.push(blob);
+    return blob;
 };
 
 CSL.NameOutput.prototype._composeOneInstitutionPart = function (names, slot, style, v) {
