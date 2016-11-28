@@ -353,6 +353,14 @@ CSL.Output.Formats.prototype.bbl = {
      * will be run only once across each portion of text to be escaped, it
      * need not be idempotent.
      */
+    /*
+      emacs regex special chars are: $^.*+?[\
+      javascript ones are:
+      pcre2 ones are:
+      guile ones are:
+      latex ones are:
+      html ones are: (see html output format, above)
+     */
     text_escape: function(text) {
         if (!text) {
             text = "";
@@ -416,13 +424,28 @@ CSL.Output.Formats.prototype.bbl = {
                                            this.suffix_txt);
     },
     '@bibliography/entry': function(state, str) {
-        var citekey, insert, sys_id;
+        //
+        // Test for this.item_id to add decorations to
+        // bibliography output of individual entries.
+        //
+        // Full item content can be obtained from
+        // state.registry.registry[id].ref, using
+        // CSL variable keys.
+        //
+        // Example:
+        //
+        //   print(state.registry.registry[this.item_id].ref["title"]);
+        //
+        // At present, for parallel citations, only the
+        // id of the master item is supplied on this.item_id.
+
+        var citekey, refsList, sys_id;
         sys_id = state.registry.registry[this.system_id].ref.id;
         citekey = "sysID" + sys_id;
         if (state.sys.getBibTeXCiteKey) {
             citekey = state.sys.getBibTeXCiteKey(sys_id, state).replace(/([$_^{%&])(?!!)/g, "\\$1");
         }
-        insert = "";
+        refsList = "";
         if (state.sys.embedBibliographyEntry) {
             console.log("state.sys.embedBibliographyEntry is defined.");
         }
@@ -430,9 +453,9 @@ CSL.Output.Formats.prototype.bbl = {
             console.log("state.sys.prototype.embedBibliographyEntry is defined.");
         }
         if (state.sys.embedBibliographyEntry || Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
-            insert = state.sys.embedBibliographyEntry(state, this.item_id);
+            refsList = state.sys.embedBibliographyEntry(this.item_id, state);
         }
-        return "\\ztbibItemText{" + sys_id + "}{" + insert + "}{" + citekey + "}{" + str + "}%\n";
+        return "\\ztbibItemText{" + sys_id + "}{" + refsList + "}{" + citekey + "}{" + str + "}%\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
