@@ -15675,13 +15675,13 @@ CSL.Output.Formats.prototype.bbl = {
                                            this.suffix_txt);
     },
     '@bibliography/entry': function(state, str) {
-        var citekey, insert, sys_id;
+        var citekey, refsList, sys_id;
         sys_id = state.registry.registry[this.system_id].ref.id;
         citekey = "sysID" + sys_id;
         if (state.sys.getBibTeXCiteKey) {
             citekey = state.sys.getBibTeXCiteKey(sys_id, state).replace(/([$_^{%&])(?!!)/g, "\\$1");
         }
-        insert = "";
+        refsList = "";
         if (state.sys.embedBibliographyEntry) {
             console.log("state.sys.embedBibliographyEntry is defined.");
         }
@@ -15689,9 +15689,9 @@ CSL.Output.Formats.prototype.bbl = {
             console.log("state.sys.prototype.embedBibliographyEntry is defined.");
         }
         if (state.sys.embedBibliographyEntry || Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
-            insert = state.sys.embedBibliographyEntry(state, this.item_id);
+            refsList = state.sys.embedBibliographyEntry(this.item_id, state);
         }
-        return "\\ztbibItemText{" + sys_id + "}{" + insert + "}{" + citekey + "}{" + str + "}%\n";
+        return "\\ztbibItemText{" + sys_id + "}{" + refsList + "}{" + citekey + "}{" + str + "}%\n";
     },
     '@display/block': function(state, str) {
         return "\\ztNewBlock{" + str + "}\n";
