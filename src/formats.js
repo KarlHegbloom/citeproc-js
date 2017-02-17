@@ -345,6 +345,31 @@ CSL.Output.Formats.prototype.rtf = {
     }
 */
 
+// function safe_stringify(obj, replacer, spaces, cycleReplacer) {
+//     return JSON.stringify(obj, safe_serializer(replacer, cycleReplacer), spaces)
+// }
+
+// function safe_serializer(replacer, cycleReplacer) {
+//   var stack = [], keys = []
+
+//   if (cycleReplacer == null) cycleReplacer = function(key, value) {
+//     if (stack[0] === value) return "[Circular ~]"
+//     return "[Circular ~." + keys.slice(0, stack.indexOf(value)).join(".") + "]"
+//   }
+
+//   return function(key, value) {
+//     if (stack.length > 0) {
+//       var thisPos = stack.indexOf(this)
+//       ~thisPos ? stack.splice(thisPos + 1) : stack.push(this)
+//       ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key)
+//       if (~stack.indexOf(value)) value = cycleReplacer.call(this, key, value)
+//     }
+//     else stack.push(value)
+
+//     return replacer == null ? value : replacer.call(this, key, value)
+//   }
+// }
+
 CSL.Output.Formats.prototype.bbl = {
     /*
      * text_escape: Format-specific function for escaping text destined
@@ -416,11 +441,13 @@ CSL.Output.Formats.prototype.bbl = {
     },
     '@bibliography/entry': function(state, str) {
         var citekey, insert, sys_id;
+        // console.log(safe_stringify(state.registry.registry, null, 2));
         sys_id = state.registry.registry[this.system_id].ref.id;
         citekey = "sysID" + sys_id;
         if (state.sys.getBibTeXCiteKey) {
             citekey = state.sys.getBibTeXCiteKey(sys_id, state).replace(/([$_^{%&])(?!!)/g, "\\$1");
         }
+        // state.registry.registry.citationreg.citationByIndex ?
         insert = "";
         if (state.sys.embedBibliographyEntry) {
             console.log("state.sys.embedBibliographyEntry is defined.");
