@@ -5,7 +5,7 @@ citation
 
 >>== ABBREVIATIONS ==>>
 {
-    "us": {
+    "us:ny": {
         "container-title": {
             "New York Supreme Court Reports": "!jurisdiction>>>N.Y.S."
         }, 

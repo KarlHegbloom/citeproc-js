@@ -126,7 +126,7 @@ CSL.Util.fixDateNode = function (parent, pos, node) {
         // Xml: Get child nodes
         //
         var childNodes = this.cslXml.children(datexml);
-        for (var i=1,ilen=childNodes.length;i<ilen;i++) {
+        for (var i=1,ilen=this.cslXml.numberofnodes(childNodes);i<ilen;i++) {
             //
             // Xml: Get attribute value (for string comparison)
             //

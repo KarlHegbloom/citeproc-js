@@ -62,48 +62,24 @@ CSL.Transform = function (state) {
     // Internal function
     function abbreviate(state, Item, altvar, basevalue, myabbrev_family, use_field) {
         var value;
-
+        // XXX This isn't right, is it?
+        // XXX Shouldn't we convert to human-readable form, and then chop?
+        //if (myabbrev_family === "jurisdiction") {
+        //    if (state.opt.suppressedJurisdictions[Item.jurisdiction]) {
+        //        return "";
+        //    }
+        //}
+        myabbrev_family = CSL.FIELD_CATEGORY_REMAP[myabbrev_family];
         if (!myabbrev_family) {
             return basevalue;
         }
 
         var variable = myabbrev_family;
-
-        var noHints = false;
-        if (["title", "title-short"].indexOf(variable) > -1 && !Item.jurisdiction) {
-            noHints = true;
-        }
-
-        if (CSL.NUMERIC_VARIABLES.indexOf(myabbrev_family) > -1) {
-            myabbrev_family = "number";
-        }
-
-        if (myabbrev_family === "jurisdiction") {
-            if (state.opt.suppressedJurisdictions[Item.jurisdiction]) {
-                return "";
-            }
-        }
-
-        if (["publisher-place", "event-place", "jurisdiction", "archive-place", "language-name", "language-name-original"].indexOf(myabbrev_family) > -1) {
-            myabbrev_family = "place";
-        }
-
-        if (["publisher", "authority"].indexOf(myabbrev_family) > -1) {
-            myabbrev_family = "institution-part";
-        }
-
-        if (["genre", "event", "medium", "title-short"].indexOf(myabbrev_family) > -1) {
-            myabbrev_family = "title";
-        }
-
-        if (["archive"].indexOf(myabbrev_family) > -1) {
-            myabbrev_family = "collection-title";
-        }
-
         // Lazy retrieval of abbreviations.
         value = "";
         if (state.sys.getAbbreviation) {
-            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, basevalue, Item.type, noHints);
+            // True is for (deprecated) noHints flag
+            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, basevalue, Item.type, true);
 
             // XXX Need a fallback mechanism here. Other to default.
             if (state.transform.abbrevs[jurisdiction][myabbrev_family] && basevalue && state.sys.getAbbreviation) {
@@ -165,12 +141,17 @@ CSL.Transform = function (state) {
     };
 
     // Internal functions
-    function getTextSubField(Item, field, locale_type, use_default, stopOrig) {
+    function getTextSubField (Item, field, locale_type, use_default, stopOrig) {
         var m, lst, opt, o, oo, pos, key, ret, len, myret, opts;
         var usedOrig = stopOrig;
+        var usingOrig = false;
 
         if (!Item[field]) {
-            return {name:"", usedOrig:stopOrig};
+            return {
+                name:"",
+                usedOrig:stopOrig,
+                token: CSL.Util.cloneToken(this)
+            };
         }
         ret = {name:"", usedOrig:stopOrig,locale:getFieldLocale(Item,field)};
 
@@ -184,11 +165,13 @@ CSL.Transform = function (state) {
                 ret = {name:Item[field], usedOrig:false, locale:getFieldLocale(Item,field)};
             }
             hasVal = true;
+            usingOrig = true;
         } else if (use_default && ("undefined" === typeof opts || opts.length === 0)) {
             // If we want the original, or if we don't have any specific guidance and we 
             // definitely want output, just return the original value.
             var ret = {name:Item[field], usedOrig:true, locale:getFieldLocale(Item,field)};
             hasVal = true;
+            usingOrig = true;
         }
 
         if (!hasVal) {
@@ -197,7 +180,7 @@ CSL.Transform = function (state) {
                 o = opt.split(/[\-_]/)[0];
                 if (opt && Item.multi && Item.multi._keys[field] && Item.multi._keys[field][opt]) {
                     ret.name = Item.multi._keys[field][opt];
-                    ret.locale = o;
+                    ret.locale = opt;
                     if (field === 'jurisdiction') jurisdictionName = ret.name;
                     break;
                 } else if (o && Item.multi && Item.multi._keys[field] && Item.multi._keys[field][o]) {
@@ -209,15 +192,23 @@ CSL.Transform = function (state) {
             }
             if (!ret.name && use_default) {
                 ret = {name:Item[field], usedOrig:true, locale:getFieldLocale(Item,field)};
+                usingOrig = true;
             }
         }
-        if (field === 'jurisdiction' && CSL.getSuppressedJurisdictionName) {
-            if (ret.name && !jurisdictionName) {
-                jurisdictionName = state.sys.getHumanForm(Item[field]);
-            }
-            // If jurisdictionName does not exist here, this will go boom.
-            if (jurisdictionName) {
-                ret.name = CSL.getSuppressedJurisdictionName.call(state, Item[field], jurisdictionName);
+        ret.token = CSL.Util.cloneToken(this);
+        if (state.sys.getHumanForm && field === 'jurisdiction' && ret.name) {
+            ret.name = CSL.getJurisdictionNameAndSuppress(state, Item[field], jurisdictionName);
+        } else if (["title", "container-title"].indexOf(field) > -1) {
+            if (!usedOrig
+                && (!ret.token.strings["text-case"]
+                    || ret.token.strings["text-case"] === "sentence"
+                    || ret.token.strings["text-case"] === "normal")) {
+                
+                var locale = usingOrig ? false : ret.locale;
+                var seg = field.slice(0,-5);
+                var sentenceCase = ret.token.strings["text-case"] === "sentence" ? true : false;
+                ret.name = CSL.titlecaseSentenceOrNormal(state, Item, seg, locale, sentenceCase);
+                delete ret.token.strings["text-case"];
             }
         }
         return ret;
@@ -226,7 +217,7 @@ CSL.Transform = function (state) {
     // Setter for abbreviation lists
     // This initializes a single abbreviation based on known
     // data.
-    function loadAbbreviation(jurisdiction, category, orig, itemType, noHints) {
+    function loadAbbreviation(jurisdiction, category, orig, itemType) {
         var pos, len;
         if (!jurisdiction) {
             jurisdiction = "default";
@@ -234,6 +225,9 @@ CSL.Transform = function (state) {
         if (!orig) {
             if (!state.transform.abbrevs[jurisdiction]) {
                 state.transform.abbrevs[jurisdiction] = new state.sys.AbbreviationSegments();
+            }
+            if (!state.transform.abbrevs[jurisdiction][category]) {
+                state.transform.abbrevs[jurisdiction][category] = {};
             }
             return jurisdiction;
         }
@@ -245,37 +239,9 @@ CSL.Transform = function (state) {
         //
         // See testrunner_stdrhino.js for an example.
         if (state.sys.getAbbreviation) {
-            // Build a list of trial keys, and step through them.
-            // When a match is hit, open an entry under the requested
-            // jurisdiction.
-            // Build the list of candidate keys.
-            var tryList = ['default'];
-            if (jurisdiction !== 'default') {
-                var workLst = jurisdiction.split(":");
-                for (var i=0, ilen=workLst.length; i < ilen; i += 1) {
-                    tryList.push(workLst.slice(0,i+1).join(":"));
-                }
-            }
-            // Step through them, from most to least specific.
-            var found = false;
-            for (var i=tryList.length - 1; i > -1; i += -1) {
-                // Protect against a missing jurisdiction list in memory.
-                if (!state.transform.abbrevs[tryList[i]]) {
-                    state.transform.abbrevs[tryList[i]] = new state.sys.AbbreviationSegments();
-                }
-                // Refresh from DB if no entry is found in memory.
-                if (!state.transform.abbrevs[tryList[i]][category][orig]) {
-                    state.sys.getAbbreviation(state.opt.styleID, state.transform.abbrevs, tryList[i], category, orig, itemType, noHints);
-                }
-                // Did we find something?
-                if (!found && state.transform.abbrevs[tryList[i]][category][orig]) {
-                    // If we found a match, but in a less-specific list, add the entry to the most
-                    // specific list before breaking.
-                    if (i < tryList.length) {
-                        state.transform.abbrevs[jurisdiction][category][orig] = state.transform.abbrevs[tryList[i]][category][orig];
-                    }
-                    found = true;
-                }
+            jurisdiction = state.sys.getAbbreviation(state.opt.styleID, state.transform.abbrevs, jurisdiction, category, orig, itemType, true);
+            if (!jurisdiction) {
+                jurisdiction = "default";
             }
         }
         return jurisdiction;
@@ -372,9 +338,10 @@ CSL.Transform = function (state) {
             }
 
             // True is for transform fallback
-            var res = getTextSubField(Item, variables[0], slot.primary, true);
+            var res = getTextSubField.call(this, Item, variables[0], slot.primary, true);
             primary = res.name;
             primary_locale = res.locale;
+            var primary_tok = res.token;
             var primaryUsedOrig = res.usedOrig;
 
             if (publisherCheck(this, Item, primary, myabbrev_family)) {
@@ -385,15 +352,17 @@ CSL.Transform = function (state) {
             secondary = false;
             tertiary = false;
             if (slot.secondary) {
-                res = getTextSubField(Item, variables[0], slot.secondary, false, res.usedOrig);
+                res = getTextSubField.call(this, Item, variables[0], slot.secondary, false, res.usedOrig);
                 secondary = res.name;
                 secondary_locale = res.locale;
+                var secondary_tok = res.token;
                 //print("XXX secondary_locale: "+secondary_locale);
             }
             if (slot.tertiary) {
-                res = getTextSubField(Item, variables[0], slot.tertiary, false, res.usedOrig);
+                res = getTextSubField.call(this, Item, variables[0], slot.tertiary, false, res.usedOrig);
                 tertiary = res.name;
                 tertiary_locale = res.locale;
+                var tertiary_tok = res.token;
                 //print("XXX tertiary_locale: "+tertiary_locale);
             }
         
@@ -413,8 +382,6 @@ CSL.Transform = function (state) {
             }
             
             // Decoration of primary (currently translit only) goes here
-            var template_tok = CSL.Util.cloneToken(this);
-            var primary_tok = CSL.Util.cloneToken(this);
             var primaryPrefix;
             if (slot.primary === "locale-translit") {
                 primaryPrefix = state.opt.citeAffixes[langPrefs][slot.primary].prefix;
@@ -454,7 +421,6 @@ CSL.Transform = function (state) {
                 state.output.append(primary, primary_tok);
 
                 if (secondary) {
-                    secondary_tok = CSL.Util.cloneToken(template_tok);
                     secondary_tok.strings.prefix = state.opt.citeAffixes[langPrefs][slot.secondary].prefix;
                     secondary_tok.strings.suffix = state.opt.citeAffixes[langPrefs][slot.secondary].suffix;
                     // Add a space if empty
@@ -490,7 +456,6 @@ CSL.Transform = function (state) {
                     }
                 }
                 if (tertiary) {
-                    tertiary_tok = CSL.Util.cloneToken(template_tok);
                     tertiary_tok.strings.prefix = state.opt.citeAffixes[langPrefs][slot.tertiary].prefix;
                     tertiary_tok.strings.suffix = state.opt.citeAffixes[langPrefs][slot.tertiary].suffix;
                     // Add a space if empty

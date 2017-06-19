@@ -268,14 +268,16 @@ CSL.XmlE4X.prototype.addInstitutionNodes = function(myxml) {
         if ("xml" == typeof node && node.elements("name").length() > 0) {
             var name = node.name[0];
             if (node.institution.length() === 0) {
-                //print("adding node");
                 institution_long = <institution
                     institution-parts="long"
+                    delimiter=", "
                     substitute-use-first="1"
                     use-last="1"/>
                 institution_part = <institution-part name="long"/>;
                 node.insertChildAfter(name,institution_long);
-                node.institution.@delimiter = node.name.@delimiter.toString();
+                if (node.name.@delimiter.toString()) {
+                    node.institution.@delimiter = node.name.@delimiter.toString();
+                }
                 if (node.name.@and.toString()) {
                     node.institution.@and = "text";
                 }

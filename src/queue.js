@@ -233,7 +233,7 @@ CSL.Output.Queue.prototype.append = function (str, tokname, notSerious, ignorePr
         this.last_char_rendered = str.slice(-1);
         // This, and not the str argument below on flipflop, is the
         // source of the flipflopper string source.
-        str = str.replace(/\s+'/g, "  \'");
+        str = str.replace(/\s+'/g, " \'");
         if (!notSerious) {
             // this condition for sort_LeadingApostropheOnNameParticle
             str = str.replace(/^'/g, " \'");
@@ -271,8 +271,10 @@ CSL.Output.Queue.prototype.append = function (str, tokname, notSerious, ignorePr
         this.state.parallel.AppendBlobPointer(curr);
     }
     if ("string" === typeof str) {
-
-        curr.push(blob);
+        if ("string" === typeof blob.blobs && [':', '!', '?', '.', ',', ';'].indexOf(blob.blobs.slice(0, 1)) > -1) {
+            blob.strings.prefix = blob.strings.prefix + blob.blobs.slice(0, 1);
+            blob.blobs = blob.blobs.slice(1);
+        }
         if (blob.strings["text-case"]) {
             //
             // This one is _particularly_ hard to follow.  It's not obvious,
@@ -302,10 +304,8 @@ CSL.Output.Queue.prototype.append = function (str, tokname, notSerious, ignorePr
         // case is not the source of the final rendered string.
         // See note above.
         //
-        this.state.fun.flipflopper.init(str, blob);
-        //CSL.debug("(queue.append blob decorations): "+blob.decorations);
-        this.state.fun.flipflopper.processTags();
-
+        curr.push(blob);
+        this.state.fun.flipflopper.processTags(blob);
     } else if (useblob) {
         curr.push(blob);
     } else {

@@ -49,8 +49,10 @@ CSL.NameOutput.prototype.init = function (names) {
     //this.namepart = {};
     // before, after
     //this.label = {};
-    
+
     this.state.tmp.group_context.tip.variable_attempt = true;
+
+    this.labelVariable = this.variables[0];
 
     if (!this.state.tmp.value.length) {
         return;
@@ -58,7 +60,9 @@ CSL.NameOutput.prototype.init = function (names) {
 };
 
 
-CSL.NameOutput.prototype.reinit = function (names) {
+CSL.NameOutput.prototype.reinit = function (names, labelVariable) {
+
+    this.labelVariable = labelVariable;
 
     if (this.state.tmp.can_substitute.value()) {
         this.nameset_offset = 0;
@@ -372,7 +376,7 @@ CSL.NameOutput.prototype.outputNames = function () {
 
 CSL.NameOutput.prototype._applyLabels = function (blob, v) {
     var txt;
-    if (!this.label || !this.label[v]) {
+    if (!this.label || !this.label[this.labelVariable]) {
         return blob;
     }
     var plural = 0;
@@ -388,24 +392,24 @@ CSL.NameOutput.prototype._applyLabels = function (blob, v) {
         }
     }
     // Some code duplication here, should be factored out.
-    if (this.label[v].before) {
-        if ("number" === typeof this.label[v].before.strings.plural) {
-            plural = this.label[v].before.strings.plural;
+    if (this.label[this.labelVariable].before) {
+        if ("number" === typeof this.label[this.labelVariable].before.strings.plural) {
+            plural = this.label[this.labelVariable].before.strings.plural;
         }
-        txt = this._buildLabel(v, plural, "before", v);
+        txt = this._buildLabel(v, plural, "before", this.labelVariable);
         this.state.output.openLevel("empty");
-        this.state.output.append(txt, this.label[v].before, true);
+        this.state.output.append(txt, this.label[this.labelVariable].before, true);
         this.state.output.append(blob, "literal", true);
         this.state.output.closeLevel("empty");
         blob = this.state.output.pop();
-    } else if (this.label[v].after) {
-        if ("number" === typeof this.label[v].after.strings.plural) {
-            plural = this.label[v].after.strings.plural;
+    } else if (this.label[this.labelVariable].after) {
+        if ("number" === typeof this.label[this.labelVariable].after.strings.plural) {
+            plural = this.label[this.labelVariable].after.strings.plural;
         }
-        txt = this._buildLabel(v, plural, "after", v);
+        txt = this._buildLabel(v, plural, "after", this.labelVariable);
         this.state.output.openLevel("empty");
         this.state.output.append(blob, "literal", true);
-        this.state.output.append(txt, this.label[v].after, true);
+        this.state.output.append(txt, this.label[this.labelVariable].after, true);
         this.state.tmp.label_blob = this.state.output.pop();
         this.state.output.append(this.state.tmp.label_blob,"literal",true);
         this.state.output.closeLevel("empty");

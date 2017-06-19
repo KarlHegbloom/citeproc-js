@@ -137,7 +137,7 @@ CSL.Output.Formats.prototype.html = {
         return "<a href=\"" + str + "\">" + str + "</a>";
     },
     "@DOI/true": function (state, str) {
-        return "<a href=\"http://dx.doi.org/" + str + "\">" + str + "</a>";
+        return "<a href=\"https://doi.org/" + str + "\">" + str + "</a>";
     }
 };
 
@@ -341,7 +341,7 @@ CSL.Output.Formats.prototype.rtf = {
         return "\\field{\\*\\fldinst{HYPERLINK \"" + str + "\"}}{\\fldrslt{"+ str +"}}";
     },
     "@DOI/true": function (state, str) {
-        return "\\field{\\*\\fldinst{HYPERLINK \"http://dx.doi.org/" + str + "\"}}{\\fldrslt{"+ str +"}}";
+        return "\\field{\\*\\fldinst{HYPERLINK \"https://doi.org/" + str + "\"}}{\\fldrslt{"+ str +"}}";
     }
 */
 

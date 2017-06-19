@@ -254,13 +254,13 @@ CSL.parseParticles = function(){
 		nameValue = caseOverride ? nameValue.toLowerCase() : nameValue;
 		var particleList = [];
 		var apostrophe;
+		var rex;
 		if (firstNameFlag) {
-			apostrophe ="\u02bb";
 			nameValue = nameValue.split("").reverse().join("");
+			rex = CSL.PARTICLE_GIVEN_REGEXP;
 		} else {
-			apostrophe ="-\u2019";
+			rex = CSL.PARTICLE_FAMILY_REGEXP;
 		}
-		var rex = new RegExp("^([^ ]+[" + apostrophe + " \'] *)(.+)$");
 		var m = nameValue.match(rex);
 		while (m) {
 			var m1 = firstNameFlag ? m[1].split("").reverse().join("") : m[1];

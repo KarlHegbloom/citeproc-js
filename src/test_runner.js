@@ -119,28 +119,6 @@ StdRhinoTest.prototype.getAbbreviation = function(dummyListNameVar, obj, jurisdi
             break;
         }
     }
-    if (!haveHit) {
-        for (var i = 0, ilen = jurisdictions.length; i < ilen; i += 1) {
-            if (["container-title", "collection-title", "number"].indexOf(category) > -1) {
-                // Let's just be inefficient
-                for (var phrase in this._acache[jurisdictions[i]]["container-phrase"]) {
-                    var newphrase = this._acache[jurisdictions[i]]["container-phrase"][phrase];
-                    newkey = newkey.replace(phrase, newphrase);
-                }
-            } else if (["institution-part", "title", "place"].indexOf(category) > -1) {
-                // And again
-                for (var phrase in this._acache[jurisdictions[i]]["title-phrase"]) {
-                    var newphrase = this._acache[jurisdictions[i]]["title-phrase"][phrase];
-                    newkey = newkey.replace(phrase, newphrase);
-                }
-            }
-        }
-        if (key !== newkey) {
-            obj[jurisdiction][category][key] = newkey;
-        } else {
-            obj[jurisdiction][category][key] = "";
-        }
-    }
     return jurisdiction;
 };
 
@@ -263,6 +241,7 @@ StdRhinoTest.prototype.run = function(){
         persons:["translit"],
         institutions:["translit"],
         titles:["translit", "translat"],
+        journals:['translit'],
         publishers:["translat"],
         places:["translat"]
     }

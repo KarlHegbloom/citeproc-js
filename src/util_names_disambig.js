@@ -62,13 +62,13 @@ CSL.NameOutput.prototype._runDisambigNames = function (lst, pos) {
             //chk = undefined;
         //}
         if ("undefined" === typeof chk) {
-            myform = this.state.inheritOpt(this.name, "form", "name-form", "long");
+            myform = this.state.inheritOpt(this.name, "form", "name-form");
             param = this.state.registry.namereg.evalname("" + this.Item.id, lst[i], i, 0, myform, myinitials);
             this.state.tmp.disambig_settings.givens[pos].push(param);
         }
         //
         // set the display mode default for givennames if required
-        myform = this.state.inheritOpt(this.name, "form", "name-form", "long");
+        myform = this.state.inheritOpt(this.name, "form", "name-form");
         paramx = this.state.registry.namereg.evalname("" + this.Item.id, lst[i], i, 0, myform, myinitials);
         // this.state.registry.namereg.evalname("" + this.Item.id, lst[i], i, 0, myform, myinitials);
         if (this.state.tmp.disambig_request) {
@@ -90,7 +90,7 @@ CSL.NameOutput.prototype._runDisambigNames = function (lst, pos) {
             // that have no first name element. These were causing an infinite loop,
             // this prevents that.
             if (this.state.opt["disambiguate-add-givenname"] && lst[i].given) {
-                param = this.state.registry.namereg.evalname("" + this.Item.id, lst[i], i, param, this.state.inheritOpt(this.name, "form", "name-form", "long"), this.state.inheritOpt(this.name, "initialize-with"));
+                param = this.state.registry.namereg.evalname("" + this.Item.id, lst[i], i, param, this.state.inheritOpt(this.name, "form", "name-form"), this.state.inheritOpt(this.name, "initialize-with"));
             }
         } else {
             //

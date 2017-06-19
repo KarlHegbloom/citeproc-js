@@ -885,6 +885,9 @@ CSL.getSpliceDelimiter = function (last_collapsed, pos) {
         if (alt_affixes && alt_affixes.delimiter) {
             this.tmp.splice_delimiter = alt_affixes.delimiter;
         }
+    } else if (!this.tmp.splice_delimiter) {
+        // This happens when no delimiter is set on cs:layout under cs:citation
+        this.tmp.splice_delimiter = "";
     }
     // Paranoia
     //if (!this.tmp.splice_delimiter) {

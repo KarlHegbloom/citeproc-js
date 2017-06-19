@@ -961,27 +961,23 @@ __ http://bitbucket.org/bdarcus/citeproc-test/src/tip/processor-tests/humans/int
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``appendCitationCluster()`` command takes a single citation
-object as argument, and an optional flag to indicate whether
-a full list of bibliography items has already been registered
-in the processor with the ``updateItems()`` command.  If the flag
-is true, the command should return an array containing exactly
-one two-element array, consisting of the current index position
+object as argument, and returns an array of two-element
+arrays, each consisting of the current index position
 as the first element, and a string for insertion into the document
 as the second.  To wit:
 
 .. sourcecode:: js
 
-   citeproc.appendCitationCluster(mycitation,true);
+   citeproc.appendCitationCluster(mycitation);
 
    [
       [ 5, "(J. Doe 2000)" ]
    ]
 
-If the flag is false, invocations of the command may return
-multiple elements in the list, when the processor sense that
-the additional bibliography items added by the citation require 
-changes to other citations to achieve disambiguation.  In this
-case, a typical return value might look like this:
+The command may return
+multiple elements, when the processor detects that
+bibliography items added by the current citation
+trigger disambiguation of previously registered cites:
 
 .. sourcecode:: js
 

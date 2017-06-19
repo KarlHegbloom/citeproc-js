@@ -274,6 +274,9 @@ CSL.XmlJSON.prototype.getNodesByName = function (myjson,name,nameattrval,ret) {
 
 CSL.XmlJSON.prototype.nodeNameIs = function (myjson,name) {
     //print("nodeNameIs()");
+    if (typeof myjson === "undefined") {
+        return false;
+    }
     if (name == myjson.name) {
         return true;
     }

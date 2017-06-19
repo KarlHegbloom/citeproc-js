@@ -79,10 +79,10 @@ CSL.Node.key = {
             // by this variable seem unlikely.
             if (variable === "citation-number") {
                 if (state.build.area === "citation" && state.build.extension === "_sort") {
-                    state.opt.citation_number_sort = true;
+                    state.opt.citation_number_sort = false;
                 }
                 if (state.build.root === "bibliography" && state.build.extension === "_sort") {
-                    state.opt.citation_number_sort_used = true;
+                    state.opt.citation_number_sort_used = false;
                 }
             }
             if (CSL.CREATORS.indexOf(variable) > -1) {
@@ -221,6 +221,10 @@ CSL.Node.key = {
         // reset key params
         func = function (state, Item) {
             // state.tmp.name_quash = new Object();
+
+            // XXX This should work, should be necessary, but doesn't and isn't.
+            //state.output.closeLevel("empty");
+
             state.tmp["et-al-min"] = undefined;
             state.tmp["et-al-use-first"] = undefined;
             state.tmp["et-al-use-last"] = undefined;

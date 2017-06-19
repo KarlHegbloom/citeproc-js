@@ -701,13 +701,15 @@ CSL.Engine.prototype.processNumber = function (node, ItemObject, variable, type)
         //val = ("" + val).replace(/^\"/, "").replace(/\"$/, "");
 
         var jurisdiction = this.transform.loadAbbreviation(ItemObject.jurisdiction, "number", val);
-        if (this.transform.abbrevs[jurisdiction].number[val]) {
-            val = this.transform.abbrevs[jurisdiction].number[val];
-        } else {
-            // Strings rendered via cs:number should not be added to the abbreviations
-            // UI unless they test non-numeric. The test happens below.
-            if ("undefined" !== typeof this.transform.abbrevs[jurisdiction].number[val]) {
-                delete this.transform.abbrevs[jurisdiction].number[val];
+        if (this.transform.abbrevs[jurisdiction].number) {
+            if (this.transform.abbrevs[jurisdiction].number[val]) {
+                val = this.transform.abbrevs[jurisdiction].number[val];
+            } else {
+                // Strings rendered via cs:number should not be added to the abbreviations
+                // UI unless they test non-numeric. The test happens below.
+                if ("undefined" !== typeof this.transform.abbrevs[jurisdiction].number[val]) {
+                    delete this.transform.abbrevs[jurisdiction].number[val];
+                }
             }
         }
     }

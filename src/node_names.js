@@ -16,11 +16,9 @@ CSL.Node.names = {
         
         if (this.tokentype === CSL.SINGLETON) {
             state.build.names_variables.push(this.variables);
-            for (var i = 0, ilen = this.variables.length; i < ilen; i += 1) {
-                state.build.name_label[this.variables[i]] = state.build.name_label[state.build.names_variables.slice(0)[0]];
-            }
             func = function (state, Item, item) {
-                state.nameOutput.reinit(this);
+                var labelVariable = state.nameOutput.labelVariable;
+                state.nameOutput.reinit(this, labelVariable);
             };
             this.execs.push(func);
         }

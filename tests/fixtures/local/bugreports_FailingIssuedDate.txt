@@ -2,7 +2,10 @@
 citation
 <<===== MODE =====<<
 
+Note that this test now requires a locale hack to
+suppress application of the AD label to small-value dates.
 
+2017-02-06
 
 >>===== RESULT =====>>
 Decision of the 最高裁判所, 平成 20 (受) 1207, February 17, 2009.
@@ -80,6 +83,7 @@ Decision of the 最高裁判所, 平成 20 (受) 1207, February 17, 2009.
         <single> Translated and edited by</single>
         <multiple> Translated and edited by</multiple>
       </term>
+      <term name="ad"></term>
     </terms>
   </locale>
   <citation disambiguate-add-names="true" et-al-min="4" et-al-use-first="1">

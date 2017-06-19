@@ -226,9 +226,9 @@ CSL.Node.group = {
                 target.push(text_node);
 
                 var if_end = new CSL.Token("if", CSL.END);
-                CSL.Node.if.build.call(if_end, state, target);
+                CSL.Node["if"].build.call(if_end, state, target);
                 var else_start = new CSL.Token("else", CSL.START);
-                CSL.Node.else.build.call(else_start, state, target);
+                CSL.Node["else"].build.call(else_start, state, target);
             }
         }
 
@@ -301,7 +301,7 @@ CSL.Node.group = {
             
             if (this.juris) {
                 var else_end = new CSL.Token("else", CSL.END);
-                CSL.Node.else.build.call(else_end, state, target);
+                CSL.Node["else"].build.call(else_end, state, target);
                 var choose_end = new CSL.Token("choose", CSL.END);
                 CSL.Node.choose.build.call(choose_end, state, target);
             }

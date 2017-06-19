@@ -320,12 +320,13 @@ CSL.getBibliographyEntries = function (bibsection) {
 
         res = this.output.string(this, this.output.queue)[0];
         
-        if (!res) {
-            res = "\n[CSL STYLE ERROR: reference with no printed form. (bib) item.id=" +
-                item.id + " item.system_id=" + item.system_id + "]\n";
-            console.log(res);
+        if (!res && this.opt.update_mode === CSL.NUMERIC) {
+            var err = (ret.length + 1) + ". [CSL STYLE ERROR: reference with no printed form.]"
+            res = CSL.Output.Formats[this.opt.mode]["@bibliography/entry"](this, err) 
         }
-        ret.push(res);
+        if (res) {
+            ret.push(res);
+        }
     }
 
     var done = false;

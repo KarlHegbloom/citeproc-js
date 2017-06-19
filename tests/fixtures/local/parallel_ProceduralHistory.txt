@@ -17,7 +17,9 @@ citation
         }, 
         "institution-part": {
             "Court of Appeals for the Eighth Circuit": "8th Cir."
-        }, 
+        }
+    }, 
+    "us:federal:mn": {
         "place": {
             "us:federal:mn": "D. Minn."
         }

@@ -172,7 +172,7 @@ CSL.Node.text = {
                     func = function (state, Item, item) {
                         var gender = state.opt.gender[Item.type];
                         var term = this.strings.term;
-                        term = state.getTerm(term, form, plural, gender, false, this.default_locale);
+                        term = state.getTerm(term, form, plural, gender, CSL.TOLERANT, this.default_locale);
                         var myterm;
                         // if the term is not an empty string, say
                         // that we rendered a term
@@ -213,6 +213,11 @@ CSL.Node.text = {
                     state.build.plural = false;
                 } else if (this.variables_real.length) {
                     func = function (state, Item, item) {
+
+                        // If some text variable is rendered, we're not collapsing.
+                        if (this.variables_real[0] !== "locator") {
+                            state.tmp.have_collapsed = false;
+                        }
                         var parallel_variable = this.variables[0];
                         
                         if (parallel_variable === "title" 

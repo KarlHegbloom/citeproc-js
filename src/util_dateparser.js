@@ -279,8 +279,22 @@ CSL.DateParser = new function () {
         var orig = txt;
         var slashPos = -1;
         var dashPos = -1;
+        var yearIsNegative = false;
         var lst;
         if (txt) {
+            // If string leads with a minus sign, strip and memo it.
+            if (txt.slice(0, 1) === "-") {
+                yearIsNegative = true;
+                txt = txt.slice(1);
+            }
+            
+            // If string is a number of 1 to 3 characters only, treat as year.
+            if (txt.match(/^[0-9]{1,3}$/)) {
+                while (txt.length < 4) {
+                    txt = "0" + txt;
+                }
+            }
+            
             // Normalize to string
             txt = "" + txt;
             // Remove things that look like times
@@ -504,6 +518,9 @@ CSL.DateParser = new function () {
                 thedate[part] = parseInt(thedate[part], 10);
             }
             
+        }
+        if (yearIsNegative && Object.keys(thedate).indexOf("year") > -1) {
+            thedate.year = (thedate.year * -1);
         }
         return thedate;
     };

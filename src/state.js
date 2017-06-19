@@ -129,11 +129,11 @@ CSL.Engine.Opt = function () {
     this['cite-lang-prefs'] = {
         persons:['orig'],
         institutions:['orig'],
-        titles:['orig','translat'],
-        journals:['translit'],
+        titles:['orig'],
+        journals:['orig'],
         publishers:['orig'],
         places:['orig'],
-        number:['translat']
+        number:['orig']
     };
 
     this.has_layout_locale = false;

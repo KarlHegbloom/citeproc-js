@@ -1,6 +1,286 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.171
+==========================
+
+- Adopt DOI patch from Rintze.
+
+==========================
+Changes in version 1.1.170
+==========================
+
+- Revert 5cdc4b from 1.1.150, which broke bibliography formatting in
+  clients. Refs:
+
+    https://github.com/Juris-M/citeproc-js/issues/15
+    https://forums.zotero.org/discussion/comment/277092
+   
+==========================
+Changes in version 1.1.169
+==========================
+
+- Avoid crash when in-field quotes appear under a quotes="false"
+  attribute. Reported on Zotero forums:
+
+    https://forums.zotero.org/discussion/65626/cannot-update-document-state-fun-decorate-params-0-params-1-is-undefined
+
+==========================
+Changes in version 1.1.168
+==========================
+
+- In in-text markup, fix parsing of open straight-quotes that immediately
+  follow other markup.
+
+    https://github.com/Juris-M/citeproc-js/issues/46
+
+==========================
+Changes in version 1.1.167
+==========================
+
+- Fix punctuation movement on user-supplied suffixes. Issue
+  reported on Zotero forums:
+
+    https://forums.zotero.org/discussion/65609/comma-period-inside-closing-quotation-mark-in-sblhs
+
+=========================
+Changes in version 1.1.166
+==========================
+
+- Preserve leading spaces on strings processed by flipflop. Issue
+  reported on Zotero forums:
+
+    https://forums.zotero.org/discussion/65702/change-in-suffix-behaviour
+
+===========================
+Changes in version 1.1.165
+==========================
+
+- Revert ffa12aa3 (Oct. 31). It did not fix bibliography disambiguation,
+  but broke it instead.
+
+==========================
+Changes in version 1.1.164
+==========================
+
+- Treat emdash the same as hyphen. Ditto as below.
+
+==========================
+Changes in version 1.1.163
+==========================
+
+- Treat endash the same as hyphen in title case transform
+
+    https://github.com/Juris-M/citeproc-js/issues/42
+
+==========================
+Changes in version 1.1.162
+==========================
+
+- Rerelease of 1.1.162 to purge bad citeproc.js bundle.
+
+    https://github.com/Juris-M/citeproc-js/issues/40
+
+==========================
+Changes in version 1.1.161
+==========================
+
+- Workaround to accommodate "single-field" names set as "name" rather than now-normal "literal."
+
+- In non-numeric styles only, silently omit references not rendered in the bibliography.
+
+==========================
+Changes in version 1.1.160
+==========================
+
+- Fix crashing bug triggered by closing quotation marks with spaces
+  on both sides.
+
+    https://github.com/citation-style-language/test-suite/blob/master/processor-tests/humans/flipflop_OrphanQuote.txt
+
+==========================
+Changes in version 1.1.159
+==========================
+
+- Set default empty-string value on citation splice delimiter when no value
+  is provided in the style.
+
+    https://forums.zotero.org/discussion/64827/macos-error-when-trying-to-insert-new-citations-or-set-doc-preferences
+
+- Do not print an ugly placeholder for items omitted from bibliography in
+  non-numeric styles. In numeric styles, format the placeholder a little
+  more nicely. Arises from discussion here:
+
+    https://forums.zotero.org/discussion/64871/csl-allow-dropping-items-from-bibliography
+
+==========================
+Changes in version 1.1.158
+==========================
+
+- Fix delimiter in author-date styles with "collapse," where an author-date
+  cite was followed by a title-date cite. The processor had detected this
+  as a collapsed cite, and delivered the wrong delimiter. Issue was reported
+  here:
+
+    https://github.com/citation-style-language/styles/pull/2558
+
+==========================
+Changes in version 1.1.157
+==========================
+
+- Make sorts of citation-number operate on cite entries rather
+  than citation labels. Follows discussion here:
+
+    https://github.com/citation-style-language/test-suite/issues/1
+
+==========================
+Changes in version 1.1.156
+==========================
+
+- Fix bug in particle parsing that rendered Shun'ichi as Shun 'ichi.
+
+    https://forums.zotero.org/discussion/64543/apostrophe-in-name-causes-truncation
+
+==========================
+Changes in version 1.1.155
+==========================
+
+- Force string authority to name shape in Juris-M styles.
+
+- Ignore authority in ordinary-field abbreviation map.
+
+==========================
+Changes in version 1.1.154
+==========================
+
+- Protect against missing abbreviation segments.
+
+==========================
+Changes in version 1.1.153
+==========================
+
+- Permit abbreviation loading via a getAbbreviation() function
+  that does not return a value. Should now be backward-compatible.
+
+==========================
+Changes in version 1.1.152
+==========================
+
+- Change to abbreviation loading. Not sure if the changes are
+  backward-compatible -- please test with local getAbbreviation
+  hook when updating.
+
+==========================
+Changes in version 1.1.151
+==========================
+
+- Fix capitalization of stop-words that precede a hyphen.
+
+  But reported by @bwiernik
+
+==========================
+Changes in version 1.1.150
+==========================
+
+- Recognize small and negative years in embedded date parser
+  (for single year values only -- will not handle ranges or
+  dates with month or month/day elements).
+
+  Bug reported by @bwiernik
+
+- Fix spelling error in code that broke certain styles.
+
+  Bug reported by @adam3smith
+
+- Set hangingindent parameter as true (boolean), not as
+  2 (int).
+
+  Bug reported by @dsifford
+
+- Correct documentation of appendCitationCluster()
+
+  Bug reported by @johannesswilm
+
+==========================
+Changes in version 1.1.149
+==========================
+
+- Fix failure to parse correctly formatted small-caps in-text
+  markup.
+
+==========================
+Changes in version 1.1.148
+==========================
+
+- Fix bug that blocked title case capitalization following
+  proper (not straight) open quotes.
+
+- Fix bug that capitalized a stop-work occurring immediately
+  before a final nocase span in in-text markup.
+
+- Fix bug that was double-rendering the title in some styles.
+
+- Recognize several additional Unicode space characters when
+  performing word splits for text-case conversions.
+
+Many thanks for feedback on these bugs from GitHub codevs
+@retorquere, @bwiernik, @adam3smith, and @KarlHegbloom.
+
+==========================
+Changes in version 1.1.147
+==========================
+
+- Rewrite of "flipflop" module for in-text markup and localized
+  quotation marks.
+
+==========================
+Changes in version 1.1.146
+==========================
+
+- Refactor text-case functions, fixing several small bugs.
+
+- Some minor code reorganization.
+
+==========================
+Changes in version 1.1.145
+==========================
+
+- Allow missing field category segments in citeproc.transform.abbrevs.
+
+- Return empty string from cs:text where term="<termname>" not present
+  in style or locale.
+
+==========================
+Changes in version 1.1.144
+==========================
+
+- Use a CSL logging method, not "print," to report
+  a fatal error in XML parsing.
+
+==========================
+Changes in version 1.1.143
+==========================
+
+- Fix bug in E4X legacy parsing module.
+
+- Consolidate abbreviation category mappings in
+  a mapping object, and use it (in CSL.Transform).
+
+==========================
+Changes in version 1.1.142
+==========================
+
+- Fix obscure bug in the inheritance of name labels, tested
+  by new standard fixture name_LabelFormatBug.
+
+==========================
+Changes in version 1.1.141
+==========================
+
+- Fix failure of suffix when @display attribute is used, but
+  not present as top-level node within cs:layout.
+
+==========================
 Changes in version 1.1.140
 ==========================
 

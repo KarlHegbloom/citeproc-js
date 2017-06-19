@@ -3,15 +3,10 @@ citation
 <<===== MODE =====<<
 
 
->>===== OPTIONS =====>>
-{
-    "wrap_url_and_doi": true
-}
-<<===== OPTIONS =====<<
 
 
 >>===== RESULT =====>>
-(His Anonymous Life <i><a href="https://doi.org/10.1111/j.1747-4469.1976.tb00951.x">10.1111/j.1747-4469.1976.tb00951.x</a></i>)
+(5BC)
 <<===== RESULT =====<<
 
 
@@ -27,10 +22,11 @@ citation
   </info>
   <citation>
     <layout>
-      <group delimiter=" " prefix="(" suffix=")">
-        <text variable="title"/>
-        <text font-style="italic" variable="DOI"/>
-      </group>
+      <date prefix="(" suffix=")" variable="issued">
+        <date-part form="long" name="month" />
+        <date-part name="day" suffix=", " />
+        <date-part name="year" />
+      </date>
     </layout>
   </citation>
 </style>
@@ -41,8 +37,11 @@ citation
 [
     {
         "id": "ITEM-1", 
-        "title": "His Anonymous Life", 
-        "DOI": "10.1111/j.1747-4469.1976.tb00951.x",
+        "issued": {
+            "date-parts": [], 
+            "raw": "-5"
+        }, 
+        "title": "Ignore me", 
         "type": "book"
     }
 ]

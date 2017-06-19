@@ -33,7 +33,7 @@
 
 var CSL = {
 
-    PROCESSOR_VERSION: "1.1.140",
+    PROCESSOR_VERSION: "1.1.171",
 
     CONDITION_LEVEL_TOP: 1,
 
@@ -217,6 +217,37 @@ var CSL = {
         this.classic = {};
         this["container-phrase"] = {};
         this["title-phrase"] = {};
+    },
+
+    FIELD_CATEGORY_REMAP: {
+        "title": "title",
+        "container-title": "container-title",
+        "collection-title": "collection-title",
+        "number": "number",
+        "place": "place",
+        "archive": "collection-title",
+        "title-short": "title",
+        "genre": "title",
+        "event": "title",
+        "medium": "title",
+		"archive-place": "place",
+		"publisher-place": "place",
+		"event-place": "place",
+		"jurisdiction": "place",
+		"language-name": "place",
+		"language-name-original": "place",
+        "call-number": "number",
+        "chapter-number": "number",
+        "collection-number": "number",
+        "edition": "number",
+        "page": "number",
+        "issue": "number",
+        "locator": "number",
+        "number-of-pages": "number",
+        "number-of-volumes": "number",
+        "volume": "number",
+        "citation-number": "number",
+        "publisher": "institution-part"
     },
     
     parseLocator: function(item) {
@@ -485,6 +516,9 @@ var CSL = {
     NOTE_FIELDS_REGEXP: /\{:(?:[\-_a-z]+|[A-Z]+):[^\}]+\}/g,
     NOTE_FIELD_REGEXP: /^([\-_a-z]+|[A-Z]+):\s*([^\}]+)$/,
 
+	PARTICLE_GIVEN_REGEXP: /^([^ ]+(?:\u02bb |\u2019 | |\' ) *)(.+)$/,
+	PARTICLE_FAMILY_REGEXP: /^([^ ]+(?:\-|\u02bb|\u2019| |\') *)(.+)$/,
+
     DISPLAY_CLASSES: ["block", "left-margin", "right-inline", "indent"],
 
     NAME_VARIABLES: [
@@ -534,80 +568,15 @@ var CSL = {
         "submitted"
     ],
 
-    // TAG_ESCAPE: /(<span class=\"no(?:case|decor)\">.*?<\/span>)/,
-    TAG_ESCAPE: function (str, stopWords) {
-        var mx, lst, len, pos, m, buf1, buf2, idx, ret, myret;
-        // A stopWords list is used when title-casing. See formatters.js
-        if (!stopWords) {
-            stopWords = [];
+    TITLE_FIELD_SPLITS: function(seg) {
+        var keys = ["title", "short", "main", "sub"];
+        var ret = {};
+        for (var i=0,ilen=keys.length;i<ilen;i++) {
+            ret[keys[i]] = seg + "title" + (keys[i] === "title" ? "" : "-" + keys[i]);
         }
-        // Pairs
-        var pairs = {
-            "<span class=\"nocase\">": "</span>",
-            "<span class=\"nodecor\">": "</span>"
-        };
-        var stack = [];
-        // Normalize markup
-        str = str.replace(/(<span)\s+(class=\"no(?:case|decor)\")\s*(>)/g, "$1 $2$3");
-        // Split and match
-        var m1match = str.match(/((?: \"| \'|\" |\'[-.,;\?:]|\[|\]|\(|\)|<span class=\"no(?:case|decor)\">|<\/span>|<\/?(?:i|sc|b|sub|sup)>))/g);
-        if (!m1match) {
-            return [str];
-        }
-        var m1split = str.split(/(?: \"| \'|\" |\'[-.,;\?:]|\[|\]|\(|\)|<span class=\"no(?:case|decor)\">|<\/span>|<\/?(?:i|sc|b|sub|sup)>)/g);
-        
-        // Adjust
-        outer: for (var i=0,ilen=m1match.length; i<ilen; i++) {
-            if (pairs[m1match[i]]) {
-                stack.push({
-                    tag: m1match[i],
-                    pos: i
-                });
-                // If current string begins with a stop word,
-                // and the previous string does not end with
-                // punctuation, move the string to the tag split.
-                var mFirstWord = m1split[i].match(/^(\s*([^' ]+[']?))(.*)/);
-                if (mFirstWord) {
-                    if (stopWords.indexOf(mFirstWord[2]) > -1) {
-                        if (!m1split[i-1].match(/[:\?\!]\s*$/)) {
-                            m1match[i-1] = m1match[i-1] + mFirstWord[1];
-                            m1split[i] = mFirstWord[3];
-                        }
-                    }
-                }
-                continue;
-            }
-            if (stack.length) {
-                // If current tag matches any tag on the stack,
-                // drop mismatched tags and move strings for
-                // the remainder, and pop the current tag.
-                for (var j=stack.length-1; j>-1; j--) {
-                    var stackObj = stack.slice(j)[0];
-                    if (m1match[i] === pairs[stackObj.tag]) {
-                        // Prune. We might be behind an apostrophe or something.
-                        stack = stack.slice(0, j+1);
-                        // Get the list position of the tag, and move strings to tags list between there and here.
-                        var startPos = stack[j].pos;
-                        for (var k=stack[j].pos+1; k<i+1; k++) {
-                            m1match[k] = m1split[k] + m1match[k];
-                            m1split[k] = "";
-                        }
-                        // Done with that one.
-                        stack.pop();
-                        break;
-                    }
-                }
-            }
-        }
-        myret = [m1split[0]];
-        for (pos = 1, len = m1split.length; pos < len; pos += 1) {
-            myret.push(m1match[pos - 1]);
-            myret.push(m1split[pos]);
-        }
-        var lst = myret.slice();
-        return lst;
+        return ret;
     },
-
+    
     // TAG_USEALL: /(<[^>]+>)/,
     TAG_USEALL: function (str) {
         var ret, open, close, end;
@@ -634,6 +603,144 @@ var CSL = {
         }
         ret[ret.length - 1] += str;
         return ret;
+    },
+
+    demoteNoiseWords: function (state, fld, drop_or_demote) {
+        var SKIP_WORDS = state.locale[state.opt.lang].opts["leading-noise-words"];
+        if (fld && drop_or_demote) {
+            fld = fld.split(/\s+/);
+            fld.reverse();
+            var toEnd = [];
+            for (var j  = fld.length - 1; j > -1; j += -1) {
+                if (SKIP_WORDS.indexOf(fld[j].toLowerCase()) > -1) {
+                    toEnd.push(fld.pop());
+                } else {
+                    break;
+                }
+            }
+            fld.reverse();
+            var start = fld.join(" ");
+            var end = toEnd.join(" ");
+            if ("drop" === drop_or_demote || !end) {
+                fld = start;
+            } else if ("demote" === drop_or_demote) {
+                fld = [start, end].join(", ");
+            }
+        }
+        return fld;
+    },
+
+    extractTitleAndSubtitle: function (Item) {
+        var segments = ["", "container-"];
+        for (var i=0,ilen=segments.length;i<ilen;i++) {
+            var seg = segments[i];
+            var title = CSL.TITLE_FIELD_SPLITS(seg);
+            var langs = [false];
+            if (Item.multi) {
+                for (var lang in Item.multi._keys[title.short]) {
+                    langs.push(lang);
+                }
+            }
+            for (var j=0,jlen=langs.length;j<ilen;j++) {
+                var lang = langs[j];
+                var vals = {};
+                if (lang) {
+                    if (Item.multi._keys[title.title]) {
+                        vals[title.title] = Item.multi._keys[title.title][lang];
+                    }
+                    if (Item.multi._keys[title["short"]]) {
+                        vals[title["short"]] = Item.multi._keys[title["short"]][lang];
+                    }
+                } else {
+                    vals[title.title] = Item[title.title];
+                    vals[title["short"]] = Item[title["short"]];
+                }
+                vals[title.main] = vals[title.title];
+                vals[title.sub] = false;
+                if (vals[title.title] && vals[title["short"]]) {
+                    var shortTitle = vals[title["short"]];
+                    offset = shortTitle.length;
+                    if (vals[title.title].slice(0,offset) === shortTitle && vals[title.title].slice(offset).match(/^\s*:/)) {
+                        vals[title.main] = vals[title.title].slice(0,offset).replace(/\s+$/,"");
+                        vals[title.sub] = vals[title.title].slice(offset).replace(/^\s*:\s*/,"");
+                    }
+                }
+                if (lang) {
+                    for (var key in vals) {
+                        if (!Item.multi._keys[key]) {
+                            Item.multi._keys[key] = {};
+                        }
+                        Item.multi._keys[key][lang] = vals[key];
+                    }
+                } else {
+                    for (var key in vals) {
+                        Item[key] = vals[key];
+                    }
+                }
+            }
+        }
+    },
+
+    titlecaseSentenceOrNormal: function(state, Item, seg, lang, sentenceCase) {
+        var title = CSL.TITLE_FIELD_SPLITS(seg);
+        var vals = {};
+        if (lang && Item.multi) {
+            if (Item.multi._keys[title.title]) {
+                vals[title.title] = Item.multi._keys[title.title][lang];
+            }
+            if (Item.multi._keys[title.main]) {
+                vals[title.main] = Item.multi._keys[title.main][lang];
+            }
+            if (Item.multi._keys[title.sub]) {
+                vals[title.sub] = Item.multi._keys[title.sub][lang];
+            }
+        } else {
+            vals[title.title] = Item[title.title];
+            vals[title.main] = Item[title.main];
+            vals[title.sub] = Item[title.sub];
+        }
+        if (vals[title.main] && vals[title.sub]) {
+            var mainTitle = vals[title.main];
+            var subTitle = vals[title.sub];
+            if (sentenceCase) {
+                mainTitle = CSL.Output.Formatters.sentence(state, mainTitle);
+                subTitle = CSL.Output.Formatters.sentence(state, subTitle);
+            } else {
+                subTitle = CSL.Output.Formatters["capitalize-first"](state, subTitle);
+            }
+            return [mainTitle, subTitle].join(vals[title.title].slice(mainTitle.length, -1 * subTitle.length));
+        } else {
+            if (sentenceCase) {
+                return CSL.Output.Formatters.sentence(state, vals[title.title]);
+            } else {
+                return vals[title.title];
+            }
+        }
+    },
+
+    getSafeEscape: function(state) {
+        if (["bibliography", "citation"].indexOf(state.tmp.area) > -1) {
+            // Callback to apply thin space hack
+            // Callback to force LTR/RTL on parens and braces
+            var callbacks = [];
+            if (state.opt.development_extensions.thin_non_breaking_space_html_hack && state.opt.mode === "html") {
+                callbacks.push(function (txt) {
+                    return txt.replace(/\u202f/g, '<span style="white-space:nowrap">&thinsp;</span>');
+                });
+            }
+            if (callbacks.length) {
+                return function (txt) {
+                    for (var i = 0, ilen = callbacks.length; i < ilen; i += 1) {
+                        txt = callbacks[i](txt);
+                    }
+                    return CSL.Output.Formats[state.opt.mode].text_escape(txt);
+                }
+            } else {
+                return CSL.Output.Formats[state.opt.mode].text_escape;
+            }
+        } else {
+            return function (txt) { return txt; };
+        }
     },
 
     SKIP_WORDS: ["about","above","across","afore","after","against","along","alongside","amid","amidst","among","amongst","anenst","apropos","apud","around","as","aside","astride","at","athwart","atop","barring","before","behind","below","beneath","beside","besides","between","beyond","but","by","circa","despite","down","during","except","for","forenenst","from","given","in","inside","into","lest","like","modulo","near","next","notwithstanding","of","off","on","onto","out","over","per","plus","pro","qua","sans","since","than","through"," thru","throughout","thruout","till","to","toward","towards","under","underneath","until","unto","up","upon","versus","vs.","v.","vs","v","via","vis-à-vis","with","within","without","according to","ahead of","apart from","as for","as of","as per","as regards","aside from","back to","because of","close to","due to","except for","far from","inside of","instead of","near to","next to","on to","out from","out of","outside of","prior to","pursuant to","rather than","regardless of","such as","that of","up to","where as","or", "yet", "so", "for", "and", "nor", "a", "an", "the", "de", "d'", "von", "van", "c", "et", "ca"],
