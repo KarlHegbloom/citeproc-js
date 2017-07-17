@@ -15676,14 +15676,14 @@ CSL.Output.Formats.prototype.bbl = {
     },
     bibstart: '',
     bibend: '',
-    '@font-style/italic': '\\zttextit{%%STRING%%}',
-    '@font-style/oblique': '\\zttextsl{%%STRING%%}',
-    '@font-style/normal': '\\zttextup{%%STRING%%}',
-    '@font-variant/small-caps': '\\zttextsc{%%STRING%%}',
+    '@font-style/italic': '{\\zttextit{%%STRING%%}}',
+    '@font-style/oblique': '{\\zttextsl{%%STRING%%}}',
+    '@font-style/normal': '{\\zttextup{%%STRING%%}}',
+    '@font-variant/small-caps': '{\\zttextsc{%%STRING%%}}',
     '@passthrough/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
-    '@font-variant/normal': '\\zttextnormal{%%STRING%%}',
-    '@font-weight/bold': '\\zttextbf{%%STRING%%}',
-    '@font-weight/normal': '\\zttextmd{%%STRING%%}',
+    '@font-variant/normal': '{\\zttextnormal{%%STRING%%}}',
+    '@font-weight/bold': '{\\zttextbf{%%STRING%%}}',
+    '@font-weight/normal': '{\\zttextmd{%%STRING%%}}',
     '@font-weight/light': false,
     '@text-decoration/none': false,
     '@text-decoration/underline': '\\underline{%%STRING%%}',
@@ -15730,25 +15730,25 @@ CSL.Output.Formats.prototype.bbl = {
         if (state.sys.embedBibliographyEntry || Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
             refsList = state.sys.embedBibliographyEntry(this.item_id, state);
         }
-        return "\\ztbibItemText{" + sys_id + "}{" + refsList + "}{" + citekey + "}{" + str + "}%\n";
+        return "{\\ztbibItemText{" + sys_id + "}{" + refsList + "}{" + citekey + "}{" + str + "}}%\n";
     },
     '@display/block': function(state, str) {
-        return "\\ztNewBlock{" + str + "}\n";
+        return "{\\ztNewBlock{" + str + "}}\n";
     },
     '@display/left-margin': function(state, str) {
-        return "\\ztLeftMargin{" + str + "}";
+        return "{\\ztLeftMargin{" + str + "}}";
     },
     '@display/right-inline': function(state, str) {
-        return "\\ztRightInline{" + str + "}\n";
+        return "{\\ztRightInline{" + str + "}}\n";
     },
     '@display/indent': function(state, str) {
-        return "\\ztbibIndent{" + str + "}\n";
+        return "{\\ztbibIndent{" + str + "}}\n";
     },
     '@showid/true': function(state, str, cslid) {
         var m, postPunct, prePunct;
         if (!state.tmp.just_looking && !state.tmp.suppress_decorations) {
             if (cslid) {
-                return "\\ztShowID{" + state.opt.nodenames[cslid] + "}{" + cslid + "}{" + str + "}";
+                return "{\\ztShowID{" + state.opt.nodenames[cslid] + "}{" + cslid + "}{" + str + "}}";
             } else if (this.params && "string" === typeof str) {
                 prePunct = "";
                 if (str) {
@@ -15770,10 +15770,10 @@ CSL.Output.Formats.prototype.bbl = {
         }
     },
     '@URL/true': function(state, str) {
-        return "\\ztHref{" + str + "}{" + str + "}";
+        return "{\\ztHref{" + str + "}{" + str + "}}";
     },
     '@DOI/true': function(state, str) {
-        return "\\ztHref{http://dx.doi.org/" + str + "}{" + str + "}";
+        return "{\\ztHref{http://dx.doi.org/" + str + "}{" + str + "}}";
     }
 };
 CSL.Output.Formats = new CSL.Output.Formats();
