@@ -405,11 +405,11 @@ CSL.DateParser = new function () {
         var suff = "";
         
         for (var i=0,ilen=delims.length; i<ilen; i++) {
-            delim = delims[i];
+            var delim = delims[i];
             //
             // Process each element ...
             //
-            date = ret.slice(delim[0], delim[1]);
+            var date = ret.slice(delim[0], delim[1]);
             outer: 
             for (var j=0,jlen=date.length; j<jlen; j++) {
                 var element = date[j];

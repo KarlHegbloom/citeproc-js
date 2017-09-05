@@ -48,13 +48,13 @@ CSL.Output.Queue.prototype.mergeTokenStrings = function (base, modifier) {
             base_token.decorations = [];
         }
         ret = new CSL.Token(base, CSL.SINGLETON);
-        key = "";
-        for (key in base_token.strings) {
+        var key = "";
+        for (var key in base_token.strings) {
             if (base_token.strings.hasOwnProperty(key)) {
                 ret.strings[key] = base_token.strings[key];
             }
         }
-        for (key in modifier_token.strings) {
+        for (var key in modifier_token.strings) {
             if (modifier_token.strings.hasOwnProperty(key)) {
                 ret.strings[key] = modifier_token.strings[key];
             }
@@ -271,9 +271,19 @@ CSL.Output.Queue.prototype.append = function (str, tokname, notSerious, ignorePr
         this.state.parallel.AppendBlobPointer(curr);
     }
     if ("string" === typeof str) {
-        if ("string" === typeof blob.blobs && [':', '!', '?', '.', ',', ';'].indexOf(blob.blobs.slice(0, 1)) > -1) {
-            blob.strings.prefix = blob.strings.prefix + blob.blobs.slice(0, 1);
-            blob.blobs = blob.blobs.slice(1);
+        if ("string" === typeof blob.blobs) {
+            if (blob.blobs.slice(0, 1) !== " ") {
+                var blobPrefix = "";
+                var blobBlobs = blob.blobs;
+                while (CSL.TERMINAL_PUNCTUATION.indexOf(blobBlobs.slice(0, 1)) > -1) {
+                    blobPrefix = blobPrefix + blobBlobs.slice(0, 1);
+                    blobBlobs = blobBlobs.slice(1);
+                }
+                if (blobBlobs && blobPrefix) {
+                    blob.strings.prefix = blob.strings.prefix + blobPrefix;
+                    blob.blobs = blobBlobs;
+                }
+            }
         }
         if (blob.strings["text-case"]) {
             //
@@ -343,7 +353,7 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
     }
 
     var blobjr, use_suffix, use_prefix, params;
-    for (i = 0, ilen = blobs.length; i < ilen; i += 1) {
+    for (var i = 0, ilen = blobs.length; i < ilen; i += 1) {
         blobjr = blobs[i];
 
         if (blobjr.strings.first_blob) {
@@ -412,7 +422,7 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
             }
             ret = ret.concat(addtoret);
         }
-        if (blobjr.strings.first_blob) {
+        if (blobjr.strings.first_blob && state.registry.registry[blobjr.strings.first_blob]) {
             // The Item.id of the entry being rendered.
             state.registry.registry[blobjr.strings.first_blob].offset = state.tmp.offset_characters;
             state.tmp.count_offset_characters = false;
@@ -430,7 +440,7 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
     }
 
     var span_split = 0;
-    for (i = 0, ilen = ret.length; i < ilen; i += 1) {
+    for (var i = 0, ilen = ret.length; i < ilen; i += 1) {
         if ("string" === typeof ret[i]) {
             span_split = (parseInt(i, 10) + 1);
             if (i < ret.length - 1  && "object" === typeof ret[i + 1]) {
@@ -466,7 +476,7 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
     var blobs_start = state.output.renderBlobs(ret.slice(0, span_split), blob_delimiter, false, blob);
     if (blobs_start && blob && (blob.decorations.length || blob.strings.suffix || blob.strings.prefix)) {
         if (!state.tmp.suppress_decorations) {
-            for (i = 0, ilen = blob.decorations.length; i < ilen; i += 1) {
+            for (var i = 0, ilen = blob.decorations.length; i < ilen; i += 1) {
                 params = blob.decorations[i];
                 if (["@cite","@bibliography", "@display", "@showid"].indexOf(params[0]) > -1) {
                     continue;
@@ -493,7 +503,7 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
         }
         blobs_start = b;
         if (!state.tmp.suppress_decorations) {
-            for (i = 0, ilen = blob.decorations.length; i < ilen; i += 1) {
+            for (var i = 0, ilen = blob.decorations.length; i < ilen; i += 1) {
                 params = blob.decorations[i];
                 if (["@cite","@bibliography", "@display", "@showid"].indexOf(params[0]) === -1) {
                     continue;
@@ -884,8 +894,8 @@ CSL.Output.Queue.adjust = function (punctInQuote) {
     };
     
     function mergeChars (First, first, Second, second, merge_right) {
-        FirstStrings = "blobs" === first ? First : First.strings;
-        SecondStrings = "blobs" === second ? Second: Second.strings;
+        var FirstStrings = "blobs" === first ? First : First.strings;
+        var SecondStrings = "blobs" === second ? Second: Second.strings;
         var firstChar = FirstStrings[first].slice(-1);
         var secondChar = SecondStrings[second].slice(0,1);
         function cullRight () {

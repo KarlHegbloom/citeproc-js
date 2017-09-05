@@ -538,7 +538,7 @@ CSL.ITERATION = 0;
 // Adds experimental fields embedded in the note field for
 // style development trial and testing purposes.
 CSL.Engine.prototype.retrieveItem = function (id) {
-    var Item, m, pos, len, mm;
+    var Item, m, pos, len, mm, i;
 
     if (!this.tmp.loadedItemIDs[id]) {
         this.tmp.loadedItemIDs[id] = true;
@@ -641,7 +641,7 @@ CSL.Engine.prototype.retrieveItem = function (id) {
     if (Item.page) {
         Item["page-first"] = Item.page;
         var num = "" + Item.page;
-        m = num.split(/\s*(?:&|, |-|\u2013)\s*/);
+        var m = num.split(/\s*(?:&|, |-|\u2013)\s*/);
         if (m[0].slice(-1) !== "\\") {
             Item["page-first"] = m[0];
         }

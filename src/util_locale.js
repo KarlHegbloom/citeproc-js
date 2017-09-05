@@ -37,9 +37,10 @@ CSL.Engine.prototype.localeConfigure = function (langspec, beShy) {
     if (beShy && this.locale[langspec.best]) {
         return;
     }
-    localexml = CSL.setupXml(this.sys.retrieveLocale("en-US"));
-    this.localeSet(localexml, "en-US", langspec.best);
-    if (langspec.best !== "en-US") {
+    if (langspec.best === "en-US") {
+        localexml = CSL.setupXml(this.sys.retrieveLocale("en-US"));
+        this.localeSet(localexml, "en-US", langspec.best);
+    } else if (langspec.best !== "en-US") {
         if (langspec.base !== langspec.best) {
             localexml = CSL.setupXml(this.sys.retrieveLocale(langspec.base));
             this.localeSet(localexml, langspec.base, langspec.best);
@@ -368,7 +369,7 @@ CSL.Engine.prototype.localeSet = function (myxml, lang_in, lang_out) {
     nodes = myxml.getNodesByName(locale, 'date');
     for (pos = 0, len = myxml.numberofnodes(nodes); pos < len; pos += 1) {
         if (true) {
-            date = nodes[pos];
+            var date = nodes[pos];
             //
             // Xml: get string value of attribute
             //

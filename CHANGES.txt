@@ -1,6 +1,91 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.177
+==========================
+
+- Do not force the trailing portion of given names to lowercase.
+
+- Avoid redundant load of en-US locale data when default locale differs.
+
+- Recognize quote before comma as a close-quote.
+
+- Bundle code without 'use strict' declaration.
+
+==========================
+Changes in version 1.1.176
+==========================
+
+- Fix long-standing bug that forced given names to lowercase after second
+  character (yeah, that was a weird thing to do).
+
+  https://forums.zotero.org/discussion/17610/apsa-problems-with-capitalization-of-mc-mac-etc/
+  https://github.com/Juris-M/citeproc-js/issues/43
+
+==========================
+Changes in version 1.1.175
+==========================
+
+- Do not distribute unnecessary files via NPM.
+
+  Reflects a pull request from Derek Sifford:
+
+    https://github.com/Juris-M/citeproc-js/pull/52
+
+- Fix bug triggered on some styles in strict mode:
+
+    https://forums.zotero.org/discussion/comment/284261
+
+==========================
+Changes in version 1.1.174
+==========================
+
+- Reenable processor tests (unit tests) in test.py.
+- Fix bug that crashed processor when makeCitationCluster() was run on an
+  unregistered item.
+
+  Addresses request by @adomasven of Zotero for registry-independent rendering
+  of formatted citation placeholders:
+  
+    https://github.com/Juris-M/citeproc-js/issues/51
+
+    also
+
+    https://github.com/zotero/zotero/pull/1242
+
+==========================
+Changes in version 1.1.173
+==========================
+
+- Adopt patch from @miguelsm replacing ES6 syntax with ES5
+
+  Adopts a pull request from @miguelsm:
+
+    https://github.com/Juris-M/citeproc-js/pull/38
+
+- Fix potential assignment of value to nonexistent key.
+
+- Declare all loose variables and set 'use strict' on bundled code object.
+- Build a CommonJS module along with the raw objects.
+
+  Reflects changes originally proposed and implemented by Derek Sifford:
+
+    https://github.com/Juris-M/citeproc-js/pull/50
+
+- Drive the ``citeproc-js`` NPM package directly from this source repo.
+  Addresses requests from Derek Sifford (above) and Aamir Shah:
+
+    https://github.com/Juris-M/citeproc-js/pull/44
+
+==========================
+Changes in version 1.1.172
+==========================
+
+- Fix bug in handling of affixes containing terminal punctuation.
+
+  https://forums.zotero.org/discussion/66827/spaces-with-full-stops-and-commas-in-footnotes
+
+==========================
 Changes in version 1.1.171
 ==========================
 

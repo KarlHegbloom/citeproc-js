@@ -73,7 +73,7 @@ CSL.Node.layout = {
             func = function (state, Item) {
 
                 state.tmp.done_vars = [];
-                if (!state.tmp.just_looking && state.registry.registry[Item.id].parallel) {
+                if (!state.tmp.just_looking && state.registry.registry[Item.id] && state.registry.registry[Item.id].parallel) {
                     state.tmp.done_vars.push("first-reference-note-number");
                 }
                 //CSL.debug(" === init rendered_name === ");
@@ -146,7 +146,7 @@ CSL.Node.layout = {
                         }
                         // Protect against double spaces, which would trigger an extra,
                         // explicit, non-breaking space.
-                        prefix = (item.prefix + sp).replace(/\s+/g, " ");
+                        var prefix = (item.prefix + sp).replace(/\s+/g, " ");
                         if (!state.tmp.just_looking) {
                             prefix = state.output.checkNestedBrace.update(prefix);
                         }

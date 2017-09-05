@@ -110,7 +110,7 @@ CSL.Util.cloneToken = function (token) {
         return token;
     }
     newtok = new CSL.Token(token.name, token.tokentype);
-    for (key in token.strings) {
+    for (var key in token.strings) {
         if (token.strings.hasOwnProperty(key)) {
             newtok.strings[key] = token.strings[key];
         }

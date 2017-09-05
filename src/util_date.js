@@ -42,7 +42,7 @@ CSL.dateAsSortKey = function (state, Item, isMacro) {
         }
         if (elem.slice(0, 4) === "year") {
             yr = CSL.Util.Dates[e].numeric(state, value);
-            prefix = "Y";
+            var prefix = "Y";
             if (yr[0] === "-") {
                 prefix = "X";
                 yr = yr.slice(1);

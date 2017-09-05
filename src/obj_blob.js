@@ -6,7 +6,7 @@ CSL.Blob = function (str, token, levelname) {
     //print(levelname);
     if (token) {
         this.strings = {"prefix":"","suffix":""};
-        for (key in token.strings) {
+        for (var key in token.strings) {
             if (token.strings.hasOwnProperty(key)) {
                 this.strings[key] = token.strings[key];
             }

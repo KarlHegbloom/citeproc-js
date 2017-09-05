@@ -104,7 +104,7 @@ CSL.setDecorations = function (state, attributes) {
     ret = [];
     for (pos in CSL.FORMAT_KEY_SEQUENCE) {
         if (true) {
-            key = CSL.FORMAT_KEY_SEQUENCE[pos];
+            var key = CSL.FORMAT_KEY_SEQUENCE[pos];
             if (attributes[key]) {
                 ret.push([key, attributes[key]]);
                 delete attributes[key];

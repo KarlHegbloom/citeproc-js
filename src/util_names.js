@@ -16,14 +16,18 @@ CSL.Util.Names.unInitialize = function (state, name) {
     punctlist = name.match(/(\-|\s+)/g);
     ret = "";
     for (i = 0, ilen = namelist.length; i < ilen; i += 1) {
-        if (CSL.ALL_ROMANESQUE_REGEXP.exec(namelist[i].slice(0,-1)) 
-            && namelist[i] 
-            && namelist[i] !== namelist[i].toUpperCase()) {
+        // if (CSL.ALL_ROMANESQUE_REGEXP.exec(namelist[i].slice(0,-1)) 
+        //    && namelist[i] 
+        //    && namelist[i] !== namelist[i].toUpperCase()) {
 
             // More or less like this, to address the following fault report:
             // http://forums.zotero.org/discussion/17610/apsa-problems-with-capitalization-of-mc-mac-etc/
-            namelist[i] = namelist[i].slice(0, 1) + namelist[i].slice(1, 2).toLowerCase() + namelist[i].slice(2);
-        }
+
+            // Leaving the name string untouched because name capitalization is varied and wonderful.
+            // https://github.com/Juris-M/citeproc-js/issues/43
+            
+            //namelist[i] = namelist[i].slice(0, 1) + namelist[i].slice(1, 2).toLowerCase() + namelist[i].slice(2);
+        // }
         ret += namelist[i];
         if (i < ilen - 1) {
             ret += punctlist[i];

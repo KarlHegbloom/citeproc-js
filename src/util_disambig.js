@@ -75,7 +75,7 @@ CSL.getAmbigConfig = function () {
     if (!config) {
         config = this.tmp.disambig_settings;
     }
-    ret = CSL.cloneAmbigConfig(config);
+    var ret = CSL.cloneAmbigConfig(config);
     return ret;
 };
 

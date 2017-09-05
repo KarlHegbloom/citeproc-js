@@ -286,9 +286,6 @@ CSL.Output.Formats.prototype.rtf = {
     "bibend":"}",
     "@display/block": "\\line{}%%STRING%%\\line\r\n",
     "@cite/entry": function (state, str) {
-        return str;
-	},
-    "@cite/entry": function (state, str) {
         // If wrapCitationEntry does not exist, cite/entry 
         // is not applied.
 		return state.sys.wrapCitationEntry(str, this.item_id, this.locator_txt, this.suffix_txt);

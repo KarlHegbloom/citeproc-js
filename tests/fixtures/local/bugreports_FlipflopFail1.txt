@@ -11,6 +11,11 @@ Now: Parsing works.
 
 2017-02-04
 
+Now: Unfortunately, the quote before the comma in T't’ must be entered
+     as a curly single quote U+2019. There are limits to what we can intuit.
+
+2017-08-23
+
 >>===== RESULT =====>>
 <div class="csl-bib-body">
   <div class="csl-entry">Hay Dprots‘e Ev Ts‘arizmi K‘aghak‘akanut‘yune (1890-Akan T’t’, Pastat’ght’eri Hraparakum) (Armenian School and the Policy of Tsarism, 1980’s, Publication of Documents)</div>
@@ -69,7 +74,7 @@ Now: Parsing works.
 {
   "id": 13831,
   "type": "book",
-  "title": "Hay Dprots‘e Ev Ts‘arizmi K‘aghak‘akanut‘yune (1890-Akan T't', Pastat'ght'eri Hraparakum) (Armenian School and the Policy of Tsarism, 1980's, Publication of Documents)",
+  "title": "Hay Dprots‘e Ev Ts‘arizmi K‘aghak‘akanut‘yune (1890-Akan T't’, Pastat'ght'eri Hraparakum) (Armenian School and the Policy of Tsarism, 1980's, Publication of Documents)",
   "note": "00000",
   "language": "en"
 }

@@ -444,7 +444,7 @@ CSL.Parallel.prototype.CloseCite = function () {
             if (container_title_pos > -1) {
                 this.cite.front = this.cite.front.slice(0,container_title_pos).concat(this.cite.front.slice(container_title_pos + 1));
             }
-            collection_number_pos = this.cite.front.indexOf("collection-number");
+            var collection_number_pos = this.cite.front.indexOf("collection-number");
             if (collection_number_pos > -1) {
                 this.cite.front = this.cite.front.slice(0,collection_number_pos).concat(this.cite.front.slice(collection_number_pos + 1));
             }
@@ -454,7 +454,7 @@ CSL.Parallel.prototype.CloseCite = function () {
         }
         //**print("[pushing cite]");
         if (this.sets.value().length === 0) {
-            has_date = false;
+            var has_date = false;
             for (pos = 0, len = this.cite.back.length; pos < len; pos += 1) {
                 x = this.cite.back[pos];
                 //**print("  ->issued="+this.cite.issued);

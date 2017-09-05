@@ -230,7 +230,7 @@ CSL.Attributes["@variable"] = function (state, arg) {
         // check for output
         func = function (state, Item, item) {
             var mydate;
-            output = false;
+            var output = false;
             for (var i=0,ilen=this.variables.length;i<ilen;i++) {
                 var variable = this.variables[i];
                 if (["authority", "committee"].indexOf(variable) > -1
@@ -404,7 +404,7 @@ CSL.Attributes["@variable"] = function (state, arg) {
                         // that have at least one attribute, or for a
                         // non-zero-length list
                         //
-                        for (key in myitem[variable]) {
+                        for (var key in myitem[variable]) {
                             if (myitem[variable][key]) {
                                 return true;
                             }
@@ -1320,7 +1320,7 @@ CSL.Attributes["@default-locale"] = function (state, arg) {
         // Workaround for Internet Exploder 6 (doesn't recognize
         // groups in str.split(/something(braced-group)something/)
         //
-        m = arg.match(/-x-(sort|translit|translat)-/g);
+        var m = arg.match(/-x-(sort|translit|translat)-/g);
         if (m) {
             for (pos = 0, len = m.length; pos < len; pos += 1) {
                 m[pos] = m[pos].replace(/^-x-/, "").replace(/-$/, "");

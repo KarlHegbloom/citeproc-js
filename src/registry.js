@@ -90,16 +90,16 @@ CSL.Registry = function (state) {
     //this.checkerator = new CSL.Checkerator();
 
     this.getSortedIds = function () {
-        ret = [];
-        for (i = 0, ilen = this.reflist.length; i < ilen; i += 1) {
+        var ret = [];
+        for (var i = 0, ilen = this.reflist.length; i < ilen; i += 1) {
             ret.push("" + this.reflist[i].id);
         }
         return ret;
     };
 
     this.getSortedRegistryItems = function () {
-        ret = [];
-        for (i = 0, ilen = this.reflist.length; i < ilen; i += 1) {
+        var ret = [];
+        for (var i = 0, ilen = this.reflist.length; i < ilen; i += 1) {
             ret.push(this.reflist[i]);
         }
         return ret;
@@ -239,7 +239,7 @@ CSL.Registry.prototype.dodeletes = function (myhash) {
     //
     //  3. Delete loop.
     //
-    for (key in this.registry) {
+    for (var key in this.registry) {
         if (!myhash[key]) {
             // skip items explicitly marked as uncited
             if (this.uncited[key]) {
@@ -335,7 +335,7 @@ CSL.Registry.prototype.doinserts = function (mylist) {
     //
     //  4. Insert loop.
     //
-    for (i = 0, ilen = mylist.length; i < ilen; i += 1) {
+    for (var i = 0, ilen = mylist.length; i < ilen; i += 1) {
         item = mylist[i];
         if (!this.registry[item]) {
             //
@@ -474,7 +474,7 @@ CSL.Registry.prototype.dorefreshes = function () {
     // (3) Register the akey in this.akeys
     // (4) Register the item ID in this.touched
     //
-    for (key in this.refreshes) {
+    for (var key in this.refreshes) {
         regtoken = this.registry[key];
         if (!regtoken) {
             continue;

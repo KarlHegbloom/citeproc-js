@@ -49,7 +49,7 @@ CSL.NameOutput.prototype.renderInstitutionNames = function () {
                 localesets = this.state.opt['cite-lang-prefs'].persons;
             }
 
-            slot = {primary:'locale-orig',secondary:false,tertiary:false};
+            var slot = {primary:'locale-orig',secondary:false,tertiary:false};
 	        if (localesets) {
 		        var slotnames = ["primary", "secondary", "tertiary"];
 		        for (var k = 0, klen = slotnames.length; k < klen; k += 1) {
@@ -85,7 +85,8 @@ CSL.NameOutput.prototype.renderInstitutionNames = function () {
 }
 
 CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
-    res = this.getName(name, slot.primary, true);
+    var secondary, tertiary, long_style, short_style, institution, institution_short, institution_long;
+    var res = this.getName(name, slot.primary, true);
     var primary = res.name;
     var usedOrig = res.usedOrig;
     if (primary) {
@@ -96,7 +97,7 @@ CSL.NameOutput.prototype._renderInstitutionName = function (v, name, slot, j) {
 	secondary = false;
 	if (slot.secondary) {
         res = this.getName(name, slot.secondary, false, usedOrig);
-        secondary = res.name;
+        var secondary = res.name;
         usedOrig = res.usedOrig;
         if (secondary) {
 			secondary = this.fixupInstitution(secondary, v, j);
@@ -303,7 +304,7 @@ CSL.NameOutput.prototype._renderNames = function (v, values, pos, j) {
             } else {
                 localesets = this.state.opt['cite-lang-prefs'].persons;
             }
-            slot = {primary:'locale-orig',secondary:false,tertiary:false};
+            var slot = {primary:'locale-orig',secondary:false,tertiary:false};
 	        if (localesets) {
 		        var slotnames = ["primary", "secondary", "tertiary"];
 		        for (var k = 0, klen = slotnames.length; k < klen; k += 1) {
@@ -349,14 +350,14 @@ CSL.NameOutput.prototype._renderPersonalName = function (v, name, slot, pos, i, 
 
     var res = this.getName(name, slot.primary, true);
     var primary = this._renderOnePersonalName(res.name, pos, i, j);
-	secondary = false;
+	var secondary = false;
 	if (slot.secondary) {
         res = this.getName(name, slot.secondary, false, res.usedOrig);
         if (res.name) {
 			secondary = this._renderOnePersonalName(res.name, pos, i, j);
         }
 	}
-	tertiary = false;
+	var tertiary = false;
 	if (slot.tertiary) {
         res = this.getName(name, slot.tertiary, false, res.usedOrig);
         if (res.name) {
@@ -371,7 +372,7 @@ CSL.NameOutput.prototype._renderPersonalName = function (v, name, slot, pos, i, 
 
         this.state.output.append(primary);
 
-        secondary_tok = new CSL.Token();
+        var secondary_tok = new CSL.Token();
         if (slot.secondary) {
             secondary_tok.strings.prefix = this.state.opt.citeAffixes.persons[slot.secondary].prefix;
             secondary_tok.strings.suffix = this.state.opt.citeAffixes.persons[slot.secondary].suffix;
@@ -382,7 +383,7 @@ CSL.NameOutput.prototype._renderPersonalName = function (v, name, slot, pos, i, 
         }
         this.state.output.append(secondary, secondary_tok);
 
-        tertiary_tok = new CSL.Token();
+        var tertiary_tok = new CSL.Token();
         if (slot.tertiary) {
             tertiary_tok.strings.prefix = this.state.opt.citeAffixes.persons[slot.tertiary].prefix;
             tertiary_tok.strings.suffix = this.state.opt.citeAffixes.persons[slot.tertiary].suffix;
@@ -705,7 +706,7 @@ CSL.NameOutput.prototype._familyName = function (name) {
 };
 
 CSL.NameOutput.prototype._givenName = function (name, pos, i) {
-
+    var ret;
     if (this.state.inheritOpt(this.name, "initialize") === false) {
         if (name.family && name.given && this.state.inheritOpt(this.name, "initialize") === false) {
             name.given = CSL.Util.Names.initializeWith(this.state, name.given, this.state.inheritOpt(this.name, "initialize-with"), true);
@@ -731,7 +732,7 @@ CSL.NameOutput.prototype._givenName = function (name, pos, i) {
 
 CSL.NameOutput.prototype._nameSuffix = function (name) {
 
-    var str = name.suffix;
+    var str = name.suffix, ret;
 
     if ("string" === typeof this.state.inheritOpt(this.name, "initialize-with")) {
         str = CSL.Util.Names.initializeWith(this.state, name.suffix, this.state.inheritOpt(this.name, "initialize-with"), true);
@@ -849,7 +850,7 @@ CSL.NameOutput.prototype.getName = function (name, slotLocaleset, fallback, stop
         foundTag = false;
         if (name.multi) {
             var langTags = this.state.opt[slotLocaleset]
-            for (i = 0, ilen = langTags.length; i < ilen; i += 1) {
+            for (var i = 0, ilen = langTags.length; i < ilen; i += 1) {
                 langTag = langTags[i];
                 if (name.multi._key[langTag]) {
                     foundTag = true;

@@ -129,7 +129,7 @@ CSL.getBibliographyEntries = function (bibsection) {
     if (bibsection && bibsection.page_start && bibsection.page_length) {
         page_item_count = 0;
         if (bibsection.page_start !== true) {
-            for (i = 0, ilen = input.length; i < ilen; i += 1) {
+            for (var i = 0, ilen = input.length; i < ilen; i += 1) {
                 skips[input[i]] = true;
                 if (bibsection.page_start == input[i]) {
                     break;
@@ -140,7 +140,7 @@ CSL.getBibliographyEntries = function (bibsection) {
 
     var processed_item_ids = [];
 
-    for (i = 0, ilen = input.length; i < ilen; i += 1) {
+    for (var i = 0, ilen = input.length; i < ilen; i += 1) {
         
         // For paged returns
         if (bibsection && bibsection.page_start && bibsection.page_length) {
@@ -318,7 +318,7 @@ CSL.getBibliographyEntries = function (bibsection) {
 
         //print("JSON "+JSON.stringify(this.output.queue[0].blobs, null, 2));
 
-        res = this.output.string(this, this.output.queue)[0];
+        var res = this.output.string(this, this.output.queue)[0];
         
         if (!res && this.opt.update_mode === CSL.NUMERIC) {
             var err = (ret.length + 1) + ". [CSL STYLE ERROR: reference with no printed form.]"

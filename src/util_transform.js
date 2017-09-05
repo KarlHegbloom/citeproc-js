@@ -121,7 +121,7 @@ CSL.Transform = function (state) {
             localeRex = new RegExp("^([a-zA-Z]{2})(?:$|-.*|.*)");
         }
         if (Item.language) {
-            m = ("" + Item.language).match(localeRex);
+            var m = ("" + Item.language).match(localeRex);
             if (m) {
                 ret = m[1];
             } else {

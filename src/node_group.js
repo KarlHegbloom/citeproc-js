@@ -2,7 +2,7 @@
 
 CSL.Node.group = {
     build: function (state, target, realGroup) {
-        var func, execs;
+        var func, execs, done_vars;
         this.realGroup = realGroup;
         if (this.tokentype === CSL.START) {
             CSL.Util.substituteStart.call(this, state, target);

@@ -104,12 +104,20 @@ class Bundle:
             {
                 "bundle_name": "citeproc.js", 
                 "e4x": False,
+                "as-module": False,
                 "note": "without e4x support"
             },
             {
                 "bundle_name": "citeproc_with_e4x.js",
                 "e4x": True,
+                "as-module": False,
                 "note": "with e4x support"
+            },
+            {
+                "bundle_name": "citeproc_commonjs.js",
+                "e4x": False,
+                "as-module": True,
+                "note": "as a module for use with nodejs"
             }
         ]
         f = ["load"]
@@ -138,7 +146,7 @@ class Bundle:
             if os.path.exists(citeproc["bundle_name"]):
                 os.unlink(citeproc["bundle_name"])
                 
-    def cleanFile(self, subfile, e4xSupport):
+    def cleanFile(self, subfile, e4xSupport, asModule):
         subfile = fixEndings(subfile)
         subfile = re.sub("(?m)^(\/\*.*?\*\/)$", "", subfile)
         subfile = re.sub("(?sm)^\s*\/\*.*?^\s*\*\/","",subfile)
@@ -146,6 +154,17 @@ class Bundle:
         subfile = re.sub("(?sm)^\s*//.*?$","",subfile)
         if not e4xSupport:
             subfile = re.sub("(?sm)^\s*load.*?$","",subfile)
+        if asModule:
+            subfile += '\nmodule.exports = CSL;\n'
+            m = re.match("(?sm)^.*PROCESSOR_VERSION:[\s\'\"]*([\.0-9]+)", subfile)
+            if m:
+                citeproc_version = m.group(1)
+                npm_version = re.sub("^1", "2", citeproc_version)
+                pkgtxt = open("package.template").read()
+                pkgtxt = re.sub("%%NPM_VERSION%%", npm_version, pkgtxt)
+                pkgtxt = re.sub("%%CITEPROC_VERSION%%", citeproc_version, pkgtxt)
+                open("package.json", "w+").write(pkgtxt)
+                print "Wrote package.json"
         subfile = re.sub("(?sm)^\s*\n","",subfile)
         return subfile
 
@@ -155,9 +174,16 @@ class Bundle:
             for f in self.files:
                 filename = os.path.join( "src", "%s.js" % f)
                 ifh = open(filename, "rb")
-                file += self.cleanFile(ifh.read(), citeproc["e4x"])
+                file += self.cleanFile(ifh.read(), citeproc["e4x"], citeproc["as-module"])
             open(citeproc["bundle_name"],"w+b").write(file)
             print "Wrote %s (processor %s)" % (citeproc["bundle_name"], citeproc["note"])
+    def unStrictify(self):
+        for citeprocInfo in self.citeprocs:
+            filename = citeprocInfo["bundle_name"]
+            txt = open(filename, "rb").read()
+            txt = re.sub("(?sm)^\'use strict\'", "", txt)
+            open(filename,"w+b").write(txt)
+
 
 class Params:
     def __init__(self,opt,args,category,force=None):
@@ -269,8 +295,8 @@ doh.register("%s.%s", [
         ofh = open( os.path.join(path("runners"), "run.js"), "w+b")
         header = 'dojo.require("doh.runner");\n'
         ofh.write(header)
-        #if self.opt.processor:
-        if False:
+        if self.opt.processor:
+        #if False:
             testpath = path("citeproc-js")
             self.category = "citeproc_js"
         else:
@@ -613,15 +639,15 @@ if __name__ == "__main__":
                       help='Attempt to validate style code for testing against the CSL schema.')
     parser.add_option("-e", "--engine", dest="engine",
                       default="rhino",
-                      help='Valid entries are "rhino" (default), "mozjs", "jsc" or "v8."')
+                      help='Valid entries are "rhino" (default), "mozjs", "jsc" or "v8" (see ./tests/config/test.cnf)')
     parser.add_option("-g", "--grind", dest="grind",
                       default=False,
                       action="store_true", 
                       help='Grind human-readable test code into machine-readable form (used only for debugging the test framework).')
-    #parser.add_option("-p", "--processor", dest="processor",
-    #                  default=False,
-    #                  action="store_true", 
-    #                  help='Run processor tests (cannot be used with -c, -g or -s opts, takes only test name as single argument).')
+    parser.add_option("-p", "--processor", dest="processor",
+                      default=False,
+                      action="store_true",
+                      help='Run processor tests (cannot be used with -c, -g or -s opts, takes only test name as single argument).')
     parser.add_option("-v", "--verbose", dest="verbose",
                       default=False,
                       action="store_true", 
@@ -638,23 +664,15 @@ if __name__ == "__main__":
         if m:
             args = [m.group(1), m.group(2)]
 
-    bundlecount = 0
-    if opt.makebundle:
-        bundlecount += 1
-
-    if bundlecount > 1:
-        print parser.print_help()
-        print "\nError: Only one of the -B, -G and -Z options can be used at one time."
-        sys.exit()
-
     if opt.makebundle:
         bundler = Bundle()
         bundler.deleteOldBundles()
         bundler.createNewBundles()
         license = ApplyLicense()
         license.apply()
-        sys.exit()
-
+        bundler.unStrictify()
+        sys.exit();
+        
     # Testing sequence:
     # + Get single tests working
     #   Get automatic grinding for single tests working
@@ -673,6 +691,7 @@ if __name__ == "__main__":
         print parser.print_help()
         print "\nError: Option -r must be used alone"
         sys.exit()
+
     #if opt.processor and (opt.grind or opt.cranky or opt.testrun):
     #    parser.print_help()
     #    print "\nError: Option -p cannot be used with options -c, -g, -s or -S.\n"
@@ -693,10 +712,10 @@ if __name__ == "__main__":
     # Set up paths engine
     # 
     category = "std"
-    #if opt.processor:
-    #    params = Params(opt,args,"citeproc_js",force="citeproc_js")
-    #elif len(args) < 2:
-    if len(args) < 2:
+    if opt.processor:
+        params = Params(opt,args,"citeproc_js",force="citeproc_js")
+    elif len(args) < 2:
+    #if len(args) < 2:
         params = Params(opt,args,category,force="std")
     else:
         params = Params(opt,args,category)
@@ -734,9 +753,11 @@ if __name__ == "__main__":
             if opt.testrun:
                 params.buildRunner()
                 params.runTests(bundle=opt.bundle)
-        #elif opt.processor:
-        #    params.buildRunner()
-        #    params.runTests()
+        elif opt.processor:
+            params.buildRunner()
+            params.runTests()
+        bundle = Bundle()
+        bundle.unStrictify()
     except (KeyboardInterrupt, SystemExit):
         for file in os.listdir("."):
             if not file.startswith("tmp") or not len(file) == 9: continue

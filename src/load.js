@@ -30,10 +30,12 @@
 // under; along; out; between; among; outside; inside; amid; amidst; against; toward; towards.
 // See https://forums.zotero.org/discussion/30484/?Focus=159613#Comment_159613
 
+'use strict'
+
 
 var CSL = {
 
-    PROCESSOR_VERSION: "1.1.171",
+    PROCESSOR_VERSION: "1.1.177",
 
     CONDITION_LEVEL_TOP: 1,
 
@@ -260,7 +262,7 @@ var CSL = {
                     var raw_locator = item.locator;
                     item.locator = raw_locator.slice(0, idx);
                     raw_locator = raw_locator.slice(idx + 1);
-                    m = raw_locator.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}).*/);
+                    var m = raw_locator.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}).*/);
                     if (m) {
                         item["locator-date"] = this.fun.dateparser.parseDateToObject(m[1]);
                         raw_locator = raw_locator.slice(m[1].length);
@@ -659,7 +661,7 @@ var CSL = {
                 vals[title.sub] = false;
                 if (vals[title.title] && vals[title["short"]]) {
                     var shortTitle = vals[title["short"]];
-                    offset = shortTitle.length;
+                    var offset = shortTitle.length;
                     if (vals[title.title].slice(0,offset) === shortTitle && vals[title.title].slice(offset).match(/^\s*:/)) {
                         vals[title.main] = vals[title.title].slice(0,offset).replace(/\s+$/,"");
                         vals[title.sub] = vals[title.title].slice(offset).replace(/^\s*:\s*/,"");

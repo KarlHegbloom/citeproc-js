@@ -51,7 +51,7 @@ CSL.XmlE4X.prototype.attributes = function (myxml) {
     ret = new Object();
     attrs = myxml.attributes();
     for each (attr in attrs) {
-        key = "@" + attr.localName();
+        var key = "@" + attr.localName();
         //
         // Needed in rhino
         //

@@ -74,7 +74,7 @@ CSL.Util.fixDateNode = function (parent, pos, node) {
     // tests: date_LocalizedTextInStyleLocaleWithTextCase
     //
     children = this.cslXml.children(datexml);
-    for (key in children) {
+    for (var key in children) {
         subnode = children[key];
         if ("date-part" === this.cslXml.nodename(subnode)) {
             partname = this.cslXml.getAttributeValue(subnode, "name");
@@ -85,7 +85,7 @@ CSL.Util.fixDateNode = function (parent, pos, node) {
     }
 
     children = this.cslXml.children(node);
-    for (key in children) {
+    for (var key in children) {
         subnode = children[key];
         if ("date-part" === this.cslXml.nodename(subnode)) {
             partname = this.cslXml.getAttributeValue(subnode, "name");

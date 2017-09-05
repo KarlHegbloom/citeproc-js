@@ -162,7 +162,7 @@ CSL.Util.Suffixator.prototype.format = function (N) {
     var key = "";
     do {
         X = ((N % 26) === 0) ? 26 : (N % 26);
-        key = this.slist[X-1] + key;
+        var key = this.slist[X-1] + key;
         N = (N - X) / 26;
     } while ( N !== 0 );
     return key;

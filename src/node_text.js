@@ -133,7 +133,7 @@ CSL.Node.text = {
                             firstoutput = false;
                             // XXX Can we do something better for length here?
                             for (var i=0,ilen=state.tmp.group_context.mystack.length; i<ilen; i++) {
-                                flags = state.tmp.group_context.mystack[i];
+                                var flags = state.tmp.group_context.mystack[i];
                                 if (!flags.variable_success && (flags.variable_attempt || (!flags.variable_attempt && !flags.term_intended))) {
                                     firstoutput = true;
                                     break;

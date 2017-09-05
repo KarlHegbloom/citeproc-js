@@ -152,7 +152,9 @@ CSL.Util.FlipFlopper = function(state) {
     
     var _nestingQuoteReverse = function() {
         var ret = {};
-        for (var key of Object.keys(_nestingData)) {
+        var keys = Object.keys(_nestingData);
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
             if (_nestingData[key].type === "quote") {
                 ret[_nestingData[key].closer] = _nestingData[key];
             }
@@ -162,7 +164,9 @@ CSL.Util.FlipFlopper = function(state) {
     
     var _nestingDataAttr = function() {
         var ret = {};
-        for (var key of Object.keys(_nestingData)) {
+        var keys = Object.keys(_nestingData);
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
             if (_nestingData[key].type === "nocase") continue;
             var attr = _nestingData[key].attr;
             var outer = _nestingData[key].outer;
@@ -187,7 +191,9 @@ CSL.Util.FlipFlopper = function(state) {
     function _getNestingOpenerParams(opener) {
         var openers = [];
         var closer;
-        for (var key of Object.keys(_nestingData)) {
+        var keys = Object.keys(_nestingData);
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
             if (_nestingData[opener].type !== "quote" || !_nestingData[opener]) {
                 openers.push(key);
             }
@@ -199,7 +205,9 @@ CSL.Util.FlipFlopper = function(state) {
 
     var _nestingParams = function() {
         var ret = {};
-        for (var key of Object.keys(_nestingData)) {
+        var keys = Object.keys(_nestingData);
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var key = keys[i];
             ret[key] = _getNestingOpenerParams(key);
         }
         return ret;
@@ -213,7 +221,9 @@ CSL.Util.FlipFlopper = function(state) {
             openers.push(opener);
             vals[_nestingParams[opener].closer] = true;
         }
-        for (var closer of Object.keys(vals)) {
+        var keys = Object.keys(vals);
+        for (var i = 0, l = keys.length; i < l; i++) {
+            var closer = keys[i];
             closers.push(closer);
         }
 
@@ -337,7 +347,7 @@ CSL.Util.FlipFlopper = function(state) {
         this.set = set;
         this.pair = pair;
         this.pop = pop;
-        _stack = [];
+        var _stack = [];
         function set(tag) {
             var attr = _nestingData[tag].attr;
             var decor = null;
@@ -380,7 +390,7 @@ CSL.Util.FlipFlopper = function(state) {
     
     function _apostropheForce(tag, str) {
         if (tag === "\'") {
-            if (str && str.match(/^[^\.\?\:\;\ ]/)) {
+            if (str && str.match(/^[^\,\.\?\:\;\ ]/)) {
                 return true;
             }
         } else if (tag === " \'" && str && str.match(/^[\ ]/)) {

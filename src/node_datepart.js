@@ -103,7 +103,7 @@ CSL.Node["date-part"] = {
                         if (state.tmp.strip_periods) {
                             value = value.replace(/\./g, "");
                         } else {
-                            for (i = 0, ilen = this.decorations.length; i < ilen; i += 1) {
+                            for (var i = 0, ilen = this.decorations.length; i < ilen; i += 1) {
                                 if ("@strip-periods" === this.decorations[i][0] && "true" === this.decorations[i][1]) {
                                     value = value.replace(/\./g, "");
                                     break;
@@ -119,7 +119,7 @@ CSL.Node["date-part"] = {
                         if (state.tmp.strip_periods) {
                             value_end = value_end.replace(/\./g, "");
                         } else {
-                            for (i = 0, ilen = this.decorations.length; i < ilen; i += 1) {
+                            for (var i = 0, ilen = this.decorations.length; i < ilen; i += 1) {
                                 if ("@strip-periods" === this.decorations[i][0] && "true" === this.decorations[i][1]) {
                                     value_end = value_end.replace(/\./g, "");
                                     break;

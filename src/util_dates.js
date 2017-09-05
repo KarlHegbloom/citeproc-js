@@ -32,6 +32,7 @@ CSL.Util.Dates.year["long"] = function (state, num) {
  * <p>Returns the result as a string.</p>
  */
 CSL.Util.Dates.year.imperial = function (state, num, end, makeShort) {
+    var year = "";
     if (!num) {
         if ("boolean" === typeof num) {
             num = "";
@@ -97,7 +98,7 @@ CSL.Util.Dates.year["short"] = function (state, num) {
 CSL.Util.Dates.year.numeric = function (state, num) {
     var m, pre;
     num = "" + num;
-    m = num.match(/([0-9]*)$/);
+    var m = num.match(/([0-9]*)$/);
     if (m) {
         pre = num.slice(0, m[1].length * -1);
         num = m[1];

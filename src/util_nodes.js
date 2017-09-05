@@ -197,7 +197,7 @@ CSL.XmlToToken = function (state, tokentype, explicitTarget) {
         //
         // xml: more xml stuff
         //
-        for (key in attributes) {
+        for (var key in attributes) {
             if (attributes.hasOwnProperty(key)) {
                 if (tokentype === CSL.END && key !== "@language" && key !== "@locale") {
                     continue;

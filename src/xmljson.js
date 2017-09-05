@@ -85,7 +85,7 @@ CSL.XmlJSON.prototype.children = function (myjson) {
 
 CSL.XmlJSON.prototype.nodename = function (myjson) {
     //print("nodename()");
-    return myjson.name;
+    return myjson ? myjson.name : null;
 };
 
 CSL.XmlJSON.prototype.attributes = function (myjson) {

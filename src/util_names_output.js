@@ -320,7 +320,7 @@ CSL.NameOutput.prototype.outputNames = function () {
         var nameobjs = this.Item[variables[0]];
         if (nameobjs) {
             for (var i = 0, ilen = nameobjs.length; i < ilen; i += 1) {
-                substring = CSL.Util.Names.getRawName(nameobjs[i]);
+                var substring = CSL.Util.Names.getRawName(nameobjs[i]);
                 if (substring) {
                     name_node_string.push(substring);
                 }
