@@ -970,7 +970,8 @@ CSL.NameOutput.prototype.fixupInstitution = function (name, varname, listpos) {
     // Convert identifiers to human-readable form before "abbreviating"
     // In MLZ w/legal support, "authority" is a name variable, and on "legal_case" it may be an identifier.
     if (this.state.sys.getHumanForm && "legal_case" === this.Item.type && "authority" === varname) {
-        name.literal = this.state.sys.getHumanForm(this.Item.jurisdiction, name.literal);
+        // true is for allowNonmatch. Returns literal key value if no key match found.
+        name.literal = this.state.sys.getHumanForm(this.Item.jurisdiction, name.literal, true);
     }
 
     name = this._splitInstitution(name, varname, listpos);
@@ -985,9 +986,13 @@ CSL.NameOutput.prototype.fixupInstitution = function (name, varname, listpos) {
     if (this.state.sys.getAbbreviation) {
         var jurisdiction = this.Item.jurisdiction;
         for (var j = 0, jlen = long_form.length; j < jlen; j += 1) {
-            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-part", long_form[j]);
-            if (this.state.transform.abbrevs[jurisdiction]["institution-part"][long_form[j]]) {
-                short_form[j] = this.state.transform.abbrevs[jurisdiction]["institution-part"][long_form[j]];
+            var normalizedKey = long_form[j];
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(long_form[j]);
+            }
+            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-part", normalizedKey);
+            if (this.state.transform.abbrevs[jurisdiction]["institution-part"][normalizedKey]) {
+                short_form[j] = this.state.transform.abbrevs[jurisdiction]["institution-part"][normalizedKey];
                 use_short_form = true;
             }
         }
@@ -1040,9 +1045,13 @@ CSL.NameOutput.prototype._splitInstitution = function (value, v, i) {
         var jurisdiction = this.Item.jurisdiction;
         for (var j = splitInstitution.length; j > 0; j += -1) {
             var str = splitInstitution.slice(0, j).join("|");
-            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-entire", str);
-            if (this.state.transform.abbrevs[jurisdiction]["institution-entire"][str]) {
-                var splitLst = this.state.transform.abbrevs[jurisdiction]["institution-entire"][str];
+            var normalizedKey = str;
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(str);
+            }
+            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-entire", normalizedKey);
+            if (this.state.transform.abbrevs[jurisdiction]["institution-entire"][normalizedKey]) {
+                var splitLst = this.state.transform.abbrevs[jurisdiction]["institution-entire"][normalizedKey];
 
                 splitLst = this.state.transform.quashCheck(splitLst);
 

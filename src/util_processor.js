@@ -180,7 +180,7 @@ CSL.Engine.prototype.normalDecorIsOrphan = function (blob, params) {
 };
 
 
-CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictionName) {
+CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictionName, chopTo) {
     // Jurisdiction suppression works by removing the registered
     // elements from the front of a (little-endian) human-readable
     // representation of the jurisdiction code.
@@ -204,6 +204,11 @@ CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictio
     // the same way. If NOT valid, they are returned verbatim.
 
     var ret = null;
+
+    if (chopTo) {
+        jurisdictionID = jurisdictionID.split(":").slice(0, chopTo).join(":");
+        jurisdictionName = state.sys.getHumanForm(jurisdictionID);
+    }
 
     if (!jurisdictionName) {
         // If a variant, jurisdictionName is already defined.
@@ -256,4 +261,4 @@ CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictio
         }
     }
     return ret;
-}
+};

@@ -190,7 +190,6 @@ CSL.Attributes["@type"] = function (state, arg) {
     this.tests.push(state.fun.match.any(this, state, tests));
 };
 
-
 CSL.Attributes["@variable"] = function (state, arg) {
     var func;
     this.variables = arg.split(/\s+/);
@@ -825,6 +824,12 @@ CSL.Attributes["@is-parallel"] = function (state, arg) {
     }
     this.strings.set_parallel_condition = values;
 };
+
+
+CSL.Attributes["@jurisdiction-depth"] = function (state, arg) {
+    this.strings.jurisdiction_depth = parseInt(arg, 10);
+};
+
 
 CSL.Attributes["@require"] = function (state, arg) {
     this.strings.require = arg;

@@ -1,6 +1,28 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
+Changes in version 1.1.178
+==========================
+
+- Recognize a function sys.normalizeAbbrevsKey. Zotero performs
+  normalization internally, presenting a list of abbreviation keys to
+  the processor that is separate from the master list of
+  abbreviations, the keys in the latter, only, being normalized. In the
+  Abbreviation Filter add-on, the master list editable, and is applied
+  directly to citations. For that to work, the processor must be
+  capable of normalizing keys internally.
+
+  This extension will have no effect on deployments that do not define
+  a normalizeAbbrevsKey function on the sys object.
+
+- Recognize a new attribute jurisdiction-depth, to limit the
+  elements of a jurisdiction code used for human-form rendering.
+
+- Set new allowNonmatch toggle on getHumanForm when remapping
+  court variable.
+
+
+==========================
 Changes in version 1.1.177
 ==========================
 

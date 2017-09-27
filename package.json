@@ -1,7 +1,7 @@
 {
   "name": "citeproc",
-  "version": "2.1.177",
-  "description": "The citeproc-js citation formatting module, in CommonJS format. This version is based on citeproc-js 1.1.177.",
+  "version": "2.1.178",
+  "description": "The citeproc-js citation formatting module, in CommonJS format. This version is based on citeproc-js 1.1.178.",
   "main": "citeproc_commonjs.js",
   "repository": {
     "type" : "git",

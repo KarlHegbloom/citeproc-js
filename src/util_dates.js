@@ -68,11 +68,15 @@ CSL.Util.Dates.year.imperial = function (state, num, end, makeShort) {
         offset = 1988;
     }
     if (label && offset) {
-        if (!state.transform.abbrevs['default']['number'][label]) {
-            state.transform.loadAbbreviation('default', "number", label);
+        var normalizedKey = label;
+        if (state.sys.normalizeAbbrevsKey) {
+            normalizedKey = state.sys.normalizeAbbrevsKey(label);
         }
-        if (state.transform.abbrevs['default']['number'][label]) {
-            label = state.transform.abbrevs['default']['number'][label];
+        if (!state.transform.abbrevs['default']['number'][normalizedKey]) {
+            state.transform.loadAbbreviation('default', "number", normalizedKey);
+        }
+        if (state.transform.abbrevs['default']['number'][normalizedKey]) {
+            label = state.transform.abbrevs['default']['number'][normalizedKey];
         };
         year = label + (num - offset);
     }

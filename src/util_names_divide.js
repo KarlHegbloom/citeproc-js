@@ -128,9 +128,13 @@ CSL.NameOutput.prototype._checkNickname = function (name) {
         var author = "";
         author = CSL.Util.Names.getRawName(name);
         if (author && this.state.sys.getAbbreviation && !(this.item && this.item["suppress-author"])) {
-            this.state.transform.loadAbbreviation("default", "nickname", author);
+            var normalizedKey = author;
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(author);
+            }
+            this.state.transform.loadAbbreviation("default", "nickname", normalizedKey);
             // XXX Why does this have to happen here?
-            var myLocalName = this.state.transform.abbrevs["default"].nickname[author];
+            var myLocalName = this.state.transform.abbrevs["default"].nickname[normalizedKey];
             if (myLocalName) {
                 if (myLocalName === "!here>>>") {
                     name = false;

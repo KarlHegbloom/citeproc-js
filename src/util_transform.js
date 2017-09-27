@@ -78,13 +78,17 @@ CSL.Transform = function (state) {
         // Lazy retrieval of abbreviations.
         value = "";
         if (state.sys.getAbbreviation) {
+            var normalizedKey = basevalue;
+            if (state.sys.normalizeAbbrevsKey) {
+                normalizedKey = state.sys.normalizeAbbrevsKey(basevalue);
+            }
             // True is for (deprecated) noHints flag
-            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, basevalue, Item.type, true);
+            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, normalizedKey, Item.type, true);
 
             // XXX Need a fallback mechanism here. Other to default.
-            if (state.transform.abbrevs[jurisdiction][myabbrev_family] && basevalue && state.sys.getAbbreviation) {
-                if (state.transform.abbrevs[jurisdiction][myabbrev_family][basevalue]) {
-                    value = state.transform.abbrevs[jurisdiction][myabbrev_family][basevalue].replace("{stet}",basevalue);
+            if (state.transform.abbrevs[jurisdiction][myabbrev_family] && normalizedKey && state.sys.getAbbreviation) {
+                if (state.transform.abbrevs[jurisdiction][myabbrev_family][normalizedKey]) {
+                    value = state.transform.abbrevs[jurisdiction][myabbrev_family][normalizedKey].replace("{stet}",basevalue);
                 }
             }
         }
@@ -196,8 +200,8 @@ CSL.Transform = function (state) {
             }
         }
         ret.token = CSL.Util.cloneToken(this);
-        if (state.sys.getHumanForm && field === 'jurisdiction' && ret.name) {
-            ret.name = CSL.getJurisdictionNameAndSuppress(state, Item[field], jurisdictionName);
+        if (state.sys.getHumanForm && ret.name && field === 'jurisdiction') {
+            ret.name = CSL.getJurisdictionNameAndSuppress(state, Item[field], jurisdictionName, this.strings.jurisdiction_depth);
         } else if (["title", "container-title"].indexOf(field) > -1) {
             if (!usedOrig
                 && (!ret.token.strings["text-case"]

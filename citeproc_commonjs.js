@@ -24,7 +24,7 @@
  */
 
 var CSL = {
-    PROCESSOR_VERSION: "1.1.177",
+    PROCESSOR_VERSION: "1.1.178",
     CONDITION_LEVEL_TOP: 1,
     CONDITION_LEVEL_BOTTOM: 2,
     PLAIN_HYPHEN_REGEX: /(?:[^\\]-|\u2013)/,
@@ -3324,8 +3324,12 @@ CSL.Engine.prototype.normalDecorIsOrphan = function (blob, params) {
     }
     return false;
 };
-CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictionName) {
+CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictionName, chopTo) {
     var ret = null;
+    if (chopTo) {
+        jurisdictionID = jurisdictionID.split(":").slice(0, chopTo).join(":");
+        jurisdictionName = state.sys.getHumanForm(jurisdictionID);
+    }
     if (!jurisdictionName) {
         jurisdictionName = state.sys.getHumanForm(jurisdictionID);
     }
@@ -3369,7 +3373,7 @@ CSL.getJurisdictionNameAndSuppress = function(state, jurisdictionID, jurisdictio
         }
     }
     return ret;
-}
+};
 module.exports = CSL;
 CSL.Engine.prototype.getCitationLabel = function (Item) {
     var label = "";
@@ -8518,8 +8522,12 @@ CSL.NameOutput.prototype._checkNickname = function (name) {
         var author = "";
         author = CSL.Util.Names.getRawName(name);
         if (author && this.state.sys.getAbbreviation && !(this.item && this.item["suppress-author"])) {
-            this.state.transform.loadAbbreviation("default", "nickname", author);
-            var myLocalName = this.state.transform.abbrevs["default"].nickname[author];
+            var normalizedKey = author;
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(author);
+            }
+            this.state.transform.loadAbbreviation("default", "nickname", normalizedKey);
+            var myLocalName = this.state.transform.abbrevs["default"].nickname[normalizedKey];
             if (myLocalName) {
                 if (myLocalName === "!here>>>") {
                     name = false;
@@ -9754,7 +9762,7 @@ CSL.NameOutput.prototype.setRenderedName = function (name) {
 }
 CSL.NameOutput.prototype.fixupInstitution = function (name, varname, listpos) {
     if (this.state.sys.getHumanForm && "legal_case" === this.Item.type && "authority" === varname) {
-        name.literal = this.state.sys.getHumanForm(this.Item.jurisdiction, name.literal);
+        name.literal = this.state.sys.getHumanForm(this.Item.jurisdiction, name.literal, true);
     }
     name = this._splitInstitution(name, varname, listpos);
     if (this.institution.strings["reverse-order"]) {
@@ -9766,9 +9774,13 @@ CSL.NameOutput.prototype.fixupInstitution = function (name, varname, listpos) {
     if (this.state.sys.getAbbreviation) {
         var jurisdiction = this.Item.jurisdiction;
         for (var j = 0, jlen = long_form.length; j < jlen; j += 1) {
-            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-part", long_form[j]);
-            if (this.state.transform.abbrevs[jurisdiction]["institution-part"][long_form[j]]) {
-                short_form[j] = this.state.transform.abbrevs[jurisdiction]["institution-part"][long_form[j]];
+            var normalizedKey = long_form[j];
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(long_form[j]);
+            }
+            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-part", normalizedKey);
+            if (this.state.transform.abbrevs[jurisdiction]["institution-part"][normalizedKey]) {
+                short_form[j] = this.state.transform.abbrevs[jurisdiction]["institution-part"][normalizedKey];
                 use_short_form = true;
             }
         }
@@ -9811,9 +9823,13 @@ CSL.NameOutput.prototype._splitInstitution = function (value, v, i) {
         var jurisdiction = this.Item.jurisdiction;
         for (var j = splitInstitution.length; j > 0; j += -1) {
             var str = splitInstitution.slice(0, j).join("|");
-            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-entire", str);
-            if (this.state.transform.abbrevs[jurisdiction]["institution-entire"][str]) {
-                var splitLst = this.state.transform.abbrevs[jurisdiction]["institution-entire"][str];
+            var normalizedKey = str;
+            if (this.state.sys.normalizeAbbrevsKey) {
+                normalizedKey = this.state.sys.normalizeAbbrevsKey(str);
+            }
+            jurisdiction = this.state.transform.loadAbbreviation(jurisdiction, "institution-entire", normalizedKey);
+            if (this.state.transform.abbrevs[jurisdiction]["institution-entire"][normalizedKey]) {
+                var splitLst = this.state.transform.abbrevs[jurisdiction]["institution-entire"][normalizedKey];
                 splitLst = this.state.transform.quashCheck(splitLst);
                 var splitSplitLst = splitLst.split(/>>[0-9]{4}>>/);
                 var m = splitLst.match(/>>([0-9]{4})>>/);
@@ -11392,6 +11408,9 @@ CSL.Attributes["@is-parallel"] = function (state, arg) {
     }
     this.strings.set_parallel_condition = values;
 };
+CSL.Attributes["@jurisdiction-depth"] = function (state, arg) {
+    this.strings.jurisdiction_depth = parseInt(arg, 10);
+};
 CSL.Attributes["@require"] = function (state, arg) {
     this.strings.require = arg;
 }
@@ -12347,10 +12366,14 @@ CSL.Transform = function (state) {
         var variable = myabbrev_family;
         value = "";
         if (state.sys.getAbbreviation) {
-            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, basevalue, Item.type, true);
-            if (state.transform.abbrevs[jurisdiction][myabbrev_family] && basevalue && state.sys.getAbbreviation) {
-                if (state.transform.abbrevs[jurisdiction][myabbrev_family][basevalue]) {
-                    value = state.transform.abbrevs[jurisdiction][myabbrev_family][basevalue].replace("{stet}",basevalue);
+            var normalizedKey = basevalue;
+            if (state.sys.normalizeAbbrevsKey) {
+                normalizedKey = state.sys.normalizeAbbrevsKey(basevalue);
+            }
+            var jurisdiction = state.transform.loadAbbreviation(Item.jurisdiction, myabbrev_family, normalizedKey, Item.type, true);
+            if (state.transform.abbrevs[jurisdiction][myabbrev_family] && normalizedKey && state.sys.getAbbreviation) {
+                if (state.transform.abbrevs[jurisdiction][myabbrev_family][normalizedKey]) {
+                    value = state.transform.abbrevs[jurisdiction][myabbrev_family][normalizedKey].replace("{stet}",basevalue);
                 }
             }
         }
@@ -12446,8 +12469,8 @@ CSL.Transform = function (state) {
             }
         }
         ret.token = CSL.Util.cloneToken(this);
-        if (state.sys.getHumanForm && field === 'jurisdiction' && ret.name) {
-            ret.name = CSL.getJurisdictionNameAndSuppress(state, Item[field], jurisdictionName);
+        if (state.sys.getHumanForm && ret.name && field === 'jurisdiction') {
+            ret.name = CSL.getJurisdictionNameAndSuppress(state, Item[field], jurisdictionName, this.strings.jurisdiction_depth);
         } else if (["title", "container-title"].indexOf(field) > -1) {
             if (!usedOrig
                 && (!ret.token.strings["text-case"]
@@ -13262,11 +13285,15 @@ CSL.Util.Dates.year.imperial = function (state, num, end, makeShort) {
         offset = 1988;
     }
     if (label && offset) {
-        if (!state.transform.abbrevs['default']['number'][label]) {
-            state.transform.loadAbbreviation('default', "number", label);
+        var normalizedKey = label;
+        if (state.sys.normalizeAbbrevsKey) {
+            normalizedKey = state.sys.normalizeAbbrevsKey(label);
         }
-        if (state.transform.abbrevs['default']['number'][label]) {
-            label = state.transform.abbrevs['default']['number'][label];
+        if (!state.transform.abbrevs['default']['number'][normalizedKey]) {
+            state.transform.loadAbbreviation('default', "number", normalizedKey);
+        }
+        if (state.transform.abbrevs['default']['number'][normalizedKey]) {
+            label = state.transform.abbrevs['default']['number'][normalizedKey];
         };
         year = label + (num - offset);
     }
