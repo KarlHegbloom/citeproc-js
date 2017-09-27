@@ -4737,11 +4737,11 @@ CSL.Engine.Opt = function () {
     this.development_extensions.static_statute_locator = false;
     this.development_extensions.csl_reverse_lookup_support = false;
     this.development_extensions.clobber_locator_if_no_statute_section = false;
-    this.development_extensions.wrap_url_and_doi = false;
+    this.development_extensions.wrap_url_and_doi = true;
     this.development_extensions.allow_force_lowercase = false;
     this.development_extensions.handle_parallel_articles = false;
     this.development_extensions.thin_non_breaking_space_html_hack = false;
-    this.development_extensions.apply_citation_wrapper = false;
+    this.development_extensions.apply_citation_wrapper = true;
     this.development_extensions.main_title_from_short_title = false;
     this.development_extensions.uppercase_subtitles = false;
     this.development_extensions.normalize_lang_keys_to_lowercase = false;
@@ -5689,10 +5689,12 @@ CSL.getCitationCluster = function (inputList, citationID) {
             if (this.tmp.has_purged_parallel) {
                 composite.push("");
             } else {
-                var errStr = "[CSL STYLE ERROR: reference with no printed form.]";
+                var errStr = "[CSL STYLE ERROR: reference with no printed form. (cite) itemID=" +
+                    error_object[itemID] + " citationID=" + error_object[citationID] + "]";
                 var preStr = pos === 0 ? txt_esc(this.citation.opt.layout_prefix) : "";
                 var sufStr = pos === (myblobs.length - 1) ? txt_esc(this.citation.opt.layout_suffix) : "";
                 composite.push(preStr + errStr + sufStr);
+                console.log("\n" + errStr + "\n");
             }
         }
         if (buffer.length && "string" === typeof composite[0]) {
@@ -15552,6 +15554,120 @@ CSL.Output.Formats.prototype.rtf = {
     },
     "@DOI/true": function (state, str) {
         return str;
+    }
+};
+CSL.Output.Formats.prototype.bbl = {
+    text_escape: function(text) {
+        if (!text) {
+            text = "";
+        }
+        return text.replace(/(?!\\)([$_^{%&])(?!!)/g, "\\$1")
+            .replace(/([$_^{%&])!/g, "$1")
+            .replace(/<abbr[^>]*>([^<]+)<\/abbr>/g, "\\abbr{$1}")
+            .replace(Zotero.CiteProc.CSL.SUPERSCRIPTS_REGEXP, (function(aChar) {
+                return "{\\textsuperscript{" + Zotero.CiteProc.CSL.SUPERSCRIPTS[aChar] + "}}";
+            }));
+    },
+    bibstart: '',
+    bibend: '',
+    '@font-style/italic': '{\\zttextit{%%STRING%%}}',
+    '@font-style/oblique': '{\\zttextsl{%%STRING%%}}',
+    '@font-style/normal': '{\\zttextup{%%STRING%%}}',
+    '@font-variant/small-caps': '{\\zttextsc{%%STRING%%}}',
+    '@passthrough/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@font-variant/normal': '{\\zttextnormal{%%STRING%%}}',
+    '@font-weight/bold': '{\\zttextbf{%%STRING%%}}',
+    '@font-weight/normal': '{\\zttextmd{%%STRING%%}}',
+    '@font-weight/light': false,
+    '@text-decoration/none': false,
+    '@text-decoration/underline': '\\underline{%%STRING%%}',
+    '@vertical-align/sup': '\\textsuperscript{%%STRING%%}',
+    '@vertical-align/sub': '\\textsubscript{%%STRING%%}',
+    '@vertical-align/baseline': false,
+    '@strip-periods/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@strip-periods/false': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@quotes/true': function(state, str) {
+        if ('undefined' === typeof(str)) {
+            return state.getTerm("open-quote");
+        }
+        return state.getTerm("open-quote") + str + state.getTerm("close-quote");
+    },
+    '@quotes/inner': function(state, str) {
+        if ('undefined' === typeof(str)) {
+            return "\u2019";
+        }
+        return state.getTerm("open-inner-quote") + str + state.getTerm("close-inner-quote");
+    },
+    '@quotes/false': false,
+    '@cite/entry': function(state, str) {
+        console.log("@cite/entry called.\n");
+        return state.sys.wrapCitationEntry(state,
+                                           str,
+                                           this.item_id,
+                                           this.locator_txt,
+                                           this.suffix_txt);
+    },
+    '@bibliography/entry': function(state, str) {
+        var citekey, refsList, sys_id;
+        sys_id = state.registry.registry[this.system_id].ref.id;
+        citekey = "sysID" + sys_id;
+        if (state.sys.getBibTeXCiteKey) {
+            citekey = state.sys.getBibTeXCiteKey(sys_id, state).replace(/([$_^{%&])(?!!)/g, "\\$1");
+        }
+        refsList = "";
+        if (state.sys.embedBibliographyEntry) {
+            console.log("state.sys.embedBibliographyEntry is defined.");
+        }
+        if (Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
+            console.log("state.sys.prototype.embedBibliographyEntry is defined.");
+        }
+        if (state.sys.embedBibliographyEntry || Object.getPrototypeOf(state.sys)['embedBibliographyEntry']) {
+            refsList = state.sys.embedBibliographyEntry(this.item_id, state);
+        }
+        return "{\\ztbibItemText{" + sys_id + "}{" + refsList + "}{" + citekey + "}{" + str + "}}%\n";
+    },
+    '@display/block': function(state, str) {
+        return "{\\ztNewBlock{" + str + "}}\n";
+    },
+    '@display/left-margin': function(state, str) {
+        return "{\\ztLeftMargin{" + str + "}}";
+    },
+    '@display/right-inline': function(state, str) {
+        return "{\\ztRightInline{" + str + "}}\n";
+    },
+    '@display/indent': function(state, str) {
+        return "{\\ztbibIndent{" + str + "}}\n";
+    },
+    '@showid/true': function(state, str, cslid) {
+        var m, postPunct, prePunct;
+        if (!state.tmp.just_looking && !state.tmp.suppress_decorations) {
+            if (cslid) {
+                return "{\\ztShowID{" + state.opt.nodenames[cslid] + "}{" + cslid + "}{" + str + "}}";
+            } else if (this.params && "string" === typeof str) {
+                prePunct = "";
+                if (str) {
+                    m = str.match(CSL.VARIABLE_WRAPPER_PREPUNCT_REX);
+                    prePunct = m[1];
+                    str = m[2];
+                }
+                postPunct = "";
+                if (str && CSL.SWAPPING_PUNCTUATION.indexOf(str.slice(-1)) > -1) {
+                    postPunct = str.slice(-1);
+                    str = str.slice(0, -1);
+                }
+                return state.sys.variableWrapper(this.params, prePunct, str, postPunct);
+            } else {
+                return str;
+            }
+        } else {
+            return str;
+        }
+    },
+    '@URL/true': function(state, str) {
+        return "{\\ztHref{" + str + "}{" + str + "}}";
+    },
+    '@DOI/true': function(state, str) {
+        return "{\\ztHref{http://dx.doi.org/" + str + "}{" + str + "}}";
     }
 };
 CSL.Output.Formats = new CSL.Output.Formats();
