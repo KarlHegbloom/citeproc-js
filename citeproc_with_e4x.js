@@ -15501,7 +15501,7 @@ CSL.Output.Formats.prototype.rtf = {
         return str;
     }
 };
-CSL.Output.Formats.prototype.bbl = {
+CSL.Output.Formats.prototype.tmzoterolatex = {
     text_escape: function(text) {
         if (!text) {
             text = "";

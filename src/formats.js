@@ -342,7 +342,7 @@ CSL.Output.Formats.prototype.rtf = {
     }
 */
 
-CSL.Output.Formats.prototype.bbl = {
+CSL.Output.Formats.prototype.tmzoterolatex = {
     /*
      * text_escape: Format-specific function for escaping text destined
      * for output.  Takes the text to be escaped as sole argument.  Function
