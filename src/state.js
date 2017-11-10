@@ -115,7 +115,7 @@ CSL.Engine.Opt = function () {
 
     this["demote-non-dropping-particle"] = "display-and-sort";
     // default of true, because none of our consuming
-    // applications so far store the various prefixes and 
+    // applications so far store the various prefixes and
     // suffixes we support in separate fields.
     this["parse-names"] = true;
     // this["auto-vietnamese-names"] = true;
@@ -318,9 +318,9 @@ CSL.Engine.Tmp = function () {
     // Used for conditional locale switching.
     this.cite_locales = [];
     this.cite_affixes = {
-        citation: false, 
+        citation: false,
         bibliography: false,
-        citation_sort: false, 
+        citation_sort: false,
         bibliography_sort: false
     };
     this.strip_periods = 0;

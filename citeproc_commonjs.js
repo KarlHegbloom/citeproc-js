@@ -4847,9 +4847,9 @@ CSL.Engine.Tmp = function () {
     this.delimiter = new CSL.Stack("", CSL.LITERAL);
     this.cite_locales = [];
     this.cite_affixes = {
-        citation: false, 
+        citation: false,
         bibliography: false,
-        citation_sort: false, 
+        citation_sort: false,
         bibliography_sort: false
     };
     this.strip_periods = 0;
