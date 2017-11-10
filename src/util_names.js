@@ -118,10 +118,9 @@ CSL.Util.Names.initializeWith = function (state, name, terminator, normalizeOnly
 
 CSL.Util.Names.doNormalize = function (state, namelist, terminator, mode) {
     var i, ilen;
+    // namelist is a flat list of given-name elements and space-like separators between them
     terminator = terminator ? terminator : "";
-    //   (2) Step through the string, deleting periods and, if initalize="false", then
-    //       (a) note abbreviations and initials (separately).
-
+    // Flag elements that look like abbreviations
     var isAbbrev = [];
     for (i = 0, ilen = namelist.length; i < ilen; i += 1) {
         if (namelist[i].length > 1 && namelist[i].slice(-1) === ".") {
@@ -133,37 +132,55 @@ CSL.Util.Names.doNormalize = function (state, namelist, terminator, mode) {
             isAbbrev.push(false);
         }
     }
-    //   (3) If initialize="false" then:
-    //       (a) Do the thing below, but only pushing terminator; or else
-    //       (b) Do the thing below
+    // Initialize the return array
     var ret = [];
+    // Step through the elements of the givenname array
     for (i = 0, ilen = namelist.length; i < ilen; i += 2) {
+        // If the element is not an abbreviation, leave it and its trailing spaces alone
         if (isAbbrev[i]) {
+            // For all elements but the last
             if (i < namelist.length - 2) {
+                // Start from scratch on space-like things following an abbreviation
                 namelist[i + 1] = "";
-                // If terminator does not end in a space,
-                // and this is a ROMANESQUE,
-                // and this or partner is not an initial,
-                // add a space.
-                // Otherwise, just use terminator.
-                // ... but always trim space-like things from the
-                // end of a cluster of initials.
-                if ((!terminator || terminator.slice(-1) && terminator.slice(-1) !== " ")
-                    && namelist[i].length && namelist[i].match(CSL.ALL_ROMANESQUE_REGEXP)
-                    && (namelist[i].length > 1 || namelist[i + 2].length > 1)) {
+                // Check to see if the terminator is just a visible space of some sort
+                // 0009 = TAB
+                // 000a = LINE FEED
+                // 000b = LINE TAB
+                // 000c = FORM FEED
+                // 000d = CARRIAGE RETURN
+                // 0020 = SPACE
+                // 00a0 = NO-BREAK SPACE
+                var onlySpace = terminator.match(/^[\u0009\u000a\u000b\u000c\u000d\u0020\u00a0]+$/)
+                // Change the empty trailing separator to a space if
+                // * There is no terminator set in the style, or the terminator is a visible space of some sort, and
+                // * The element is romanesque; and
+                // * The separator will fall between two single-character initials
+                if (
+                    onlySpace
+                    || (
+                        (!terminator || (terminator.slice(-1) && !terminator.slice(-1).match(/[\u0009\u000a\u000b\u000c\u000d\u0020\u00a0]/)))
+                        && namelist[i].length && namelist[i].match(CSL.ALL_ROMANESQUE_REGEXP)
+                        && (namelist[i].length > 1 || namelist[i + 2].length > 1)
+                    )
+                ) {
                     namelist[i + 1] = " ";
                 }
+                // Add the terminator to the element
+                // If the following element is not a single-character abbreviation, remove a trailing zero-width non-break space, if present
+                // These ops may leave some duplicate cruft in the elements and separators. This will be cleaned at the end of the function.
                 if (namelist[i + 2].length > 1) {
-                    namelist[i] = namelist[i] + terminator.replace(/[\u0009\u000a\u000b\u000c\u000d\u0020\ufeff\u00a0]+$/, "");
+                    namelist[i] = namelist[i] + terminator.replace(/\ufeff$/, "");
                 } else {
                     namelist[i] = namelist[i] + terminator;
                 }
             }
+            // For the last element (if it is an abbreviation), just append the terminator
             if (i === namelist.length - 1) {
                 namelist[i] = namelist[i] + terminator;
             }
         }
     }
+    // Remove trailing cruft and duplicate spaces, and return
     return namelist.join("").replace(/[\u0009\u000a\u000b\u000c\u000d\u0020\ufeff\u00a0]+$/,"").replace(/\s*\-\s*/g, "-").replace(/[\u0009\u000a\u000b\u000c\u000d\u0020]+/g, " ");
 };
 
