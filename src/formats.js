@@ -227,7 +227,7 @@ CSL.Output.Formats.prototype.text = {
 };
 
 /**
- * Plain text output specification.
+ * RTF output specification.
  *
  * (Code contributed by Simon Kornblith, Center for History and New Media,
  * George Mason University.)
@@ -329,7 +329,6 @@ CSL.Output.Formats.prototype.rtf = {
 };
 
 /*
-
     This does not seem to work in Zotero plugins. For some reason the scope of the link does not
     close when interpreted by the LibreOffice. Perhaps this creates a field within a field,
     and that is not allowed?
