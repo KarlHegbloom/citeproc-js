@@ -314,14 +314,54 @@ CSL.Node.text = {
                                         // true is for non-suppression of periods
                                         if (state.opt.development_extensions.wrap_url_and_doi) {
                                             if (!this.decorations.length || this.decorations[0][0] !== "@" + this.variables[0]) {
-                                                this.decorations = [["@" + this.variables[0], "true"]].concat(this.decorations);
+                                                if (this.variables_real[0] === "DOI" && this.strings.prefix === "https://doi.org/") {
+                                                    // Special-casing to fix https://github.com/Juris-M/citeproc-js/issues/57
+                                                    // clone current token, to avoid collateral damage
+                                                    var clonetoken = CSL.Util.cloneToken(this);
+                                                    // cast a group blob
+                                                    var groupblob = new CSL.Blob(null, null, "url-wrapper");
+                                                    // set the DOI decoration on the blob
+                                                    groupblob.decorations.push(["@DOI", "true"]);
+                                                    // strip a proper DOI prefix
+                                                    value = value.replace(/^https?:\/\/doi\.org\//, "");
+                                                    if (value.match(/^https?:\/\//)) {
+                                                        // don't mess with an HTTP[S] prefix if value already has one
+                                                        var prefix = "";
+                                                    } else {
+                                                        // otherwise do the normal thing
+                                                        var prefix = "https://doi.org/";
+                                                    }
+                                                    // cast a text blob
+                                                    // set the prefix as the content of the blob
+                                                    var prefixblob = new CSL.Blob(prefix);
+                                                    // cast another text blob
+                                                    // set the value as the content of the second blob
+                                                    var valueblob = new CSL.Blob(value);
+                                                    // remove prefix from the clone
+                                                    clonetoken.strings.prefix = "";
+                                                    // append new text token and clone to group token
+                                                    groupblob.push(prefixblob);
+                                                    groupblob.push(valueblob);
+                                                    // append group token to output
+                                                    state.output.append(groupblob, clonetoken, false, false, true);
+                                                } else {
+                                                    this.decorations = [["@" + this.variables[0], "true"]].concat(this.decorations);
+                                                    state.output.append(value, this, false, false, true);
+                                                }
+                                            } else {
+                                                state.output.append(value, this, false, false, true);
                                             }
                                         } else {
-                                            if (this.decorations.length && this.decorations[0][0] === "@" + this.variables[0]) {
-                                                this.decorations = this.decorations.slice(1);
+                                            // This is totally unnecessary, isn't it?
+                                            if (this.decorations.length) {
+                                                for (var i=this.decorations.length-1; i>-1; i--) {
+                                                    if (this.decorations[i][0] === "@" + this.variables[0]) {
+                                                        this.decorations = this.decorations.slice(0, i).concat(this.decorations.slice(i+1));
+                                                    }
+                                                }
                                             }
+                                            state.output.append(value, this, false, false, true);
                                         }
-                                        state.output.append(value, this, false, false, true);
                                     }
                                 }
                             };

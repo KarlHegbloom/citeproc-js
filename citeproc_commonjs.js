@@ -24,7 +24,7 @@
  */
 
 var CSL = {
-    PROCESSOR_VERSION: "1.1.180",
+    PROCESSOR_VERSION: "1.1.182",
     CONDITION_LEVEL_TOP: 1,
     CONDITION_LEVEL_BOTTOM: 2,
     PLAIN_HYPHEN_REGEX: /(?:[^\\]-|\u2013)/,
@@ -3284,6 +3284,13 @@ CSL.Doppeler = function(rexStr, stringMangler) {
             };
         }
         var split = str.split(splitRex);
+        for (var i=match.length-1; i> -1; i--) {
+            var tag = match[i];
+            if (tag === "\'" && split[i+1].length > 0) {
+                split[i+1] = match[i] + split[i+1];
+                match[i] = "";
+            }
+        }
         return {
             tags: match,
             strings: split,
@@ -10662,14 +10669,39 @@ CSL.Node.text = {
                                     if (value) {
                                         if (state.opt.development_extensions.wrap_url_and_doi) {
                                             if (!this.decorations.length || this.decorations[0][0] !== "@" + this.variables[0]) {
-                                                this.decorations = [["@" + this.variables[0], "true"]].concat(this.decorations);
+                                                if (this.variables_real[0] === "DOI" && this.strings.prefix === "https://doi.org/") {
+                                                    var clonetoken = CSL.Util.cloneToken(this);
+                                                    var groupblob = new CSL.Blob(null, null, "url-wrapper");
+                                                    groupblob.decorations.push(["@DOI", "true"]);
+                                                    value = value.replace(/^https?:\/\/doi.org\//, "");
+                                                    if (value.match(/^https?:\/\//)) {
+                                                        var prefix = "";
+                                                    } else {
+                                                        var prefix = "https://doi.org/";
+                                                    }
+                                                    var prefixblob = new CSL.Blob(prefix);
+                                                    var valueblob = new CSL.Blob(value);
+                                                    clonetoken.strings.prefix = "";
+                                                    groupblob.push(prefixblob);
+                                                    groupblob.push(valueblob);
+                                                    state.output.append(groupblob, clonetoken, false, false, true);
+                                                } else {
+                                                    this.decorations = [["@" + this.variables[0], "true"]].concat(this.decorations);
+                                                    state.output.append(value, this, false, false, true);
+                                                }
+                                            } else {
+                                                state.output.append(value, this, false, false, true);
                                             }
                                         } else {
-                                            if (this.decorations.length && this.decorations[0][0] === "@" + this.variables[0]) {
-                                                this.decorations = this.decorations.slice(1);
+                                            if (this.decorations.length) {
+                                                for (var i=this.decorations.length-1; i>-1; i--) {
+                                                    if (this.decorations[i][0] === "@" + this.variables[0]) {
+                                                        this.decorations = this.decorations.slice(0, i).concat(this.decorations.slice(i+1));
+                                                    }
+                                                }
                                             }
+                                            state.output.append(value, this, false, false, true);
                                         }
-                                        state.output.append(value, this, false, false, true);
                                     }
                                 }
                             };
@@ -15436,7 +15468,11 @@ CSL.Output.Formats.prototype.html = {
         return "<a href=\"" + str + "\">" + str + "</a>";
     },
     "@DOI/true": function (state, str) {
-        return "<a href=\"https://doi.org/" + str + "\">" + str + "</a>";
+        var doiurl = str;
+        if (!str.match(/^https?:\/\//)) {
+            doiurl = "https://doi.org/" + str;
+        }
+        return "<a href=\"" + doiurl + "\">" + str + "</a>";
     }
 };
 CSL.Output.Formats.prototype.text = {

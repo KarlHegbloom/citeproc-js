@@ -298,7 +298,11 @@ StdRhinoTest.prototype.run = function(){
             this._setCache();
         }
         var citation = this.test.citations.slice(-1)[0];
-        [data, result] = this.style.processCitationCluster(citation[0],citation[1],citation[2]);
+        if (citation) {
+            [data, result] = this.style.processCitationCluster(citation[0],citation[1],citation[2]);
+        } else {
+            [data, result] = this.style.rebuildProcessorState([], null, []);
+        }
     };
     var indexMap = new Object();
     for (var pos in result){

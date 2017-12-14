@@ -1,13 +1,46 @@
 Summary of changes to citeproc-js since version 1.0.0 release.
 
 ==========================
-Changes in version 1.1.180
+Changes in version 1.1.182
+==========================
+
+- Test runner: Do not crash on an empty input array.
+
+- Test runner: Permit testing for an empty return value.
+
+- When a specific URL prefix is set on cs:text with variable="DOI"
+  (prefix="https://doi.org/"), and processor option wrap_url_and_doi is
+  in effect, include the prefix in the html:a wrapper when generating
+  HTML output. But:
+
+  * If the field value does not already have a non-DOI HTML prefix, leave it untouched.
+  * If the field value has an HTTP DOI prefix, normalize to HTTPS.
+  * If the field value has an HTTPS prefix already, use it direct.
+
+  Issue reported by Dan Stillman:
+    https://github.com/Juris-M/citeproc-js/issues/57
+
+  Related test fixture:
+    https://github.com/Juris-M/citeproc-js/blob/master/tests/fixtures/local/magic_WrapDOI.txt
+
+==========================
+Changes in version 1.1.181
 ==========================
 
 - Fix bad spacing with initialize="false" and initialize-with="." or initialize-with=". ",
   with givenname input such as "A. Ben."
 
   https://forums.zotero.org/discussion/68482/how-to-create-a-modified-version-of-a-style-and-keep-the-original
+
+- Protect against an undefined variable
+
+  https://github.com/Juris-M/citeproc-js/pull/58
+
+==========================
+Changes in version 1.1.180
+==========================
+
+- Um. Something.
 
 ==========================
 Changes in version 1.1.179

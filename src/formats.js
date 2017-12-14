@@ -137,7 +137,11 @@ CSL.Output.Formats.prototype.html = {
         return "<a href=\"" + str + "\">" + str + "</a>";
     },
     "@DOI/true": function (state, str) {
-        return "<a href=\"https://doi.org/" + str + "\">" + str + "</a>";
+        var doiurl = str;
+        if (!str.match(/^https?:\/\//)) {
+            doiurl = "https://doi.org/" + str;
+        }
+        return "<a href=\"" + doiurl + "\">" + str + "</a>";
     }
 };
 

@@ -447,7 +447,7 @@ class CslTest:
         self.hp = os.path.sep.join(hpath)
 	self.CREATORS = ["author","editor","translator","recipient","interviewer"]
         self.CREATORS += ["composer","original-author","container-author","collection-editor"]
-        self.RE_ELEMENT = '(?sm)^(.*>>=[^\n]*%s[^\n]+)\n(.*)(\n<<=.*%s.*)'
+        self.RE_ELEMENT = '(?sm)^(.*>>=[^\n]*%s[^\n]+)(?:\n(.*))?(\n<<=.*%s.*)'
         self.RE_FILENAME = '^[-a-z]+_[a-zA-Z0-9]+\.txt$'
         self.script = os.path.split(sys.argv[0])[1]
         self.pickle = ".".join((os.path.splitext( self.script )[0], "pkl"))
@@ -480,10 +480,14 @@ class CslTest:
         m = re.match(self.RE_ELEMENT %(tag,tag),self.raw)
         data = False
         if m:
-            if rstrip:
-                data = m.group(2).rstrip()
+            if m.group(2) == None:
+                data = ""
             else:
-                data = m.group(2).strip()
+                data = m.group(2)
+            if rstrip:
+                data = data.rstrip()
+            else:
+                data = data.strip()
         elif required:
             raise ElementMissing(self.script,tag,self.testname)
         if data != False:
