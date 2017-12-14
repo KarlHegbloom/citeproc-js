@@ -10673,7 +10673,7 @@ CSL.Node.text = {
                                                     var clonetoken = CSL.Util.cloneToken(this);
                                                     var groupblob = new CSL.Blob(null, null, "url-wrapper");
                                                     groupblob.decorations.push(["@DOI", "true"]);
-                                                    value = value.replace(/^https?:\/\/doi.org\//, "");
+                                                    value = value.replace(/^https?:\/\/doi\.org\//, "");
                                                     if (value.match(/^https?:\/\//)) {
                                                         var prefix = "";
                                                     } else {
@@ -15646,7 +15646,7 @@ CSL.Output.Formats.prototype.tmzoterolatex = {
     '@font-style/oblique': '{\\zttextsl{%%STRING%%}}',
     '@font-style/normal': '{\\zttextup{%%STRING%%}}',
     '@font-variant/small-caps': '{\\zttextsc{%%STRING%%}}',
-    '@passthrough/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@passthrough/true': CSL.Output.Formatters.passthrough,
     '@font-variant/normal': '{\\zttextnormal{%%STRING%%}}',
     '@font-weight/bold': '{\\zttextbf{%%STRING%%}}',
     '@font-weight/normal': '{\\zttextmd{%%STRING%%}}',
@@ -15656,8 +15656,8 @@ CSL.Output.Formats.prototype.tmzoterolatex = {
     '@vertical-align/sup': '\\textsuperscript{%%STRING%%}',
     '@vertical-align/sub': '\\textsubscript{%%STRING%%}',
     '@vertical-align/baseline': false,
-    '@strip-periods/true': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
-    '@strip-periods/false': Zotero.CiteProc.CSL.Output.Formatters.passthrough,
+    '@strip-periods/true': CSL.Output.Formatters.passthrough,
+    '@strip-periods/false': CSL.Output.Formatters.passthrough,
     '@quotes/true': function(state, str) {
         if ('undefined' === typeof(str)) {
             return state.getTerm("open-quote");
@@ -15739,7 +15739,11 @@ CSL.Output.Formats.prototype.tmzoterolatex = {
         return "{\\ztHref{" + str + "}{" + str + "}}";
     },
     '@DOI/true': function(state, str) {
-        return "{\\ztHref{http://dx.doi.org/" + str + "}{" + str + "}}";
+        var doiurl = str;
+        if (!str.match(/^https?:\/\//)) {
+            doiurl = "https://doi.org/" + str;
+        }
+        return "{\\ztHref{" + doiurl + "}{" + str + "}}";
     }
 };
 CSL.Output.Formats = new CSL.Output.Formats();
