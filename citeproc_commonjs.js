@@ -24,7 +24,7 @@
  */
 
 var CSL = {
-    PROCESSOR_VERSION: "1.1.190",
+    PROCESSOR_VERSION: "1.1.191",
     CONDITION_LEVEL_TOP: 1,
     CONDITION_LEVEL_BOTTOM: 2,
     PLAIN_HYPHEN_REGEX: /(?:[^\\]-|\u2013)/,
@@ -13165,8 +13165,8 @@ CSL.Engine.prototype.dateParseArray = function (date_obj) {
             exts = ["", "_end"];
             for (var i = 0, ilen = dp.length; i < ilen; i += 1) {
                 for (var j = 0, jlen = CSL.DATE_PARTS.length; j < jlen; j += 1) {
-                    if ("undefined" === typeof dp[i][j]) {
-                        ret[(CSL.DATE_PARTS[j] + exts[i])] = dp[i][j];
+                    if (isNaN(parseInt(dp[i][j], 10))) {
+                        ret[(CSL.DATE_PARTS[j] + exts[i])] = undefined;
                     } else {
                         ret[(CSL.DATE_PARTS[j] + exts[i])] = parseInt(dp[i][j], 10);
                     }

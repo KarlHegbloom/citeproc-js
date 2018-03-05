@@ -2,6 +2,15 @@ Summary of changes to citeproc-js since version 1.0.0 release.
 
 
 ==========================
+Changes in version 1.1.191
+==========================
+
+- Handle empty strings fed to a date conversion function properly.
+  Addresses the rather scathing comment here:
+
+    https://github.com/Juris-M/citeproc-js/issues/62
+
+==========================
 Changes in version 1.1.190
 ==========================
 
