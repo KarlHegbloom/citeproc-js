@@ -1,6 +1,9 @@
 ======
 README
 ======
+
+This is a slightly modified clone of Mr. Frank Bennett's citeproc.js. The tmzoterolatex outputFormat has been added, and some option variables are set to true that are not set in the stock copy of citeproc-js that is included in Juris-M 5.0. This citeproc-js is primarily what the propachi-texmacs add-in for Juris-M exists for the installation of.
+
 -----------
 citeproc-js
 -----------
