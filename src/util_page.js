@@ -7,7 +7,7 @@ CSL.Util.PageRangeMangler.getFunction = function (state, rangeType) {
     
     var range_delimiter = state.getTerm(rangeType + "-range-delimiter");
 
-    rangerex = /([a-zA-Z]*)([0-9]+)\s*(?:\u2013|-)\s*([a-zA-Z]*)([0-9]+)/;
+    rangerex = /([0-9]*[a-zA-Z]+0*)?([0-9]+)\s*(?:\u2013|-)\s*([0-9]*[a-zA-Z]+0*)?([0-9]+)/;
 
     stringify = function (lst) {
         len = lst.length;
@@ -30,8 +30,10 @@ CSL.Util.PageRangeMangler.getFunction = function (state, rangeType) {
         var delimRex = new RegExp("([^\\\\])[-" + this_range_delimiter + "\\u2013]", "g");
         str = str.replace(delimRex, "$1 - ").replace(/\s+-\s+/g, " - ");
         // Workaround for Internet Explorer
-        var rexm = new RegExp("([a-zA-Z]*[0-9]+" + hyphens + "[a-zA-Z]*[0-9]+)", "g");
-        var rexlst = new RegExp("[a-zA-Z]*[0-9]+" + hyphens + "[a-zA-Z]*[0-9]+");
+        //var rexm = new RegExp("((?:[0-9]*[a-zA-Z]+)?[0-9]+" + hyphens + "(?:[0-9]*[a-zA-Z]+)?[0-9]+)", "g");
+        //var rexlst = new RegExp("(?:[0-9]*[a-zA-Z]+)?[0-9]+" + hyphens + "(?:[0-9]*[a-zA-Z]+)?[0-9]+");
+        var rexm = new RegExp("((?:[0-9]*[a-zA-Z]+0*)?[0-9]+" + hyphens + "(?:[0-9]*[a-zA-Z]+0*)?[0-9]+)", "g");
+        var rexlst = new RegExp("(?:[0-9]*[a-zA-Z]+0*)?[0-9]+" + hyphens + "(?:[0-9]*[a-zA-Z]+0*)?[0-9]+");
         m = str.match(rexm);
         lst = str.split(rexlst);
         if (lst.length === 0) {
@@ -58,7 +60,7 @@ CSL.Util.PageRangeMangler.getFunction = function (state, rangeType) {
                         m[4] = m[2].slice(0, (m[2].length - m[4].length)) + m[4];
                     }
                     if (parseInt(m[2], 10) < parseInt(m[4], 10)) {
-                        m[3] = range_delimiter + m[1];
+                        m[3] = range_delimiter + (m[1] ? m[1] : "");
                         lst[pos] = m.slice(1);
                     }
                 }

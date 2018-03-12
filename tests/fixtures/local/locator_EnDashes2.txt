@@ -5,13 +5,13 @@ citation
 
 Test string prompted by Mark Bruffey.
 
-Note the failure of the en-dash on "13-14 etc." Distinguishing
-that construct from a non-numeric entity is a step too far.
-
+To avoid false positives, collapsing the Chicago-style page-n-note format
+takes place only if the full literal pinpoint is written out at both ends
+of the range.
 
 >>===== RESULT =====>>
 ..[0] Book Title
->>[1] Ibid., 293-a, 262–63, fol. 294, esp. 1536–1538, nn. 11–12 with 13-14 etc
+>>[1] Ibid., 8n8-9, 8n10–14, ix–xv
 <<===== RESULT =====<<
 
 
@@ -39,7 +39,7 @@ that construct from a non-numeric entity is a step too far.
                 {
                     "id": "ITEM-1", 
                     "label": "page", 
-                    "locator": "293-a, 262-263, fol. 294, esp. 1536-1538, n. 11-12 with 13-14 etc"
+                    "locator": "8n8-9, 8n10-8n14, ix-xv"
                 }
             ], 
             "properties": {

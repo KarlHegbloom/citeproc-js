@@ -2,6 +2,28 @@ Summary of changes to citeproc-js since version 1.0.0 release.
 
 
 ==========================
+Changes in version 1.1.194
+==========================
+
+- Some cleanup and improvement of parsing in numeric and locator
+  fields.
+
+==========================
+Changes in version 1.1.193
+==========================
+
+- A small tweak to after-collapse-delimiter to make the attribute
+  useful in styles using collapse="year", as well as
+  collapse="year-suffix".
+
+==========================
+Changes in version 1.1.192
+==========================
+
+- Handle Chicago-style page-n-note pinpoint ranges a little
+  better.
+
+==========================
 Changes in version 1.1.191
 ==========================
 

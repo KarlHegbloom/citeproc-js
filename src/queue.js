@@ -366,6 +366,10 @@ CSL.Output.Queue.prototype.string = function (state, myblobs, blob) {
             if ("number" === typeof blobjr.num) {
                 ret.push(blobjr);
             } else if (blobjr.blobs) {
+                if (blobjr.particle) {
+                    blobjr.blobs = blobjr.particle + blobjr.blobs;
+                    blobjr.particle = "";
+                }
                 // (skips empty strings)
                 //b = txt_esc(blobjr.blobs);
                 b = txt_esc(blobjr.blobs);

@@ -874,8 +874,42 @@ CSL.getAmbiguousCite = function (Item, disambig, visualForm, item) {
  * completion of the run.</p>
  */
 
-CSL.getSpliceDelimiter = function (last_collapsed, pos) {
-    if (last_collapsed && ! this.tmp.have_collapsed && "string" === typeof this.citation.opt["after-collapse-delimiter"]) {
+CSL.getSpliceDelimiter = function (last_locator, last_collapsed, pos) {
+    //print(pos +  " after-collapse-delimiter="+this.citation.opt["after-collapse-delimiter"] + "\n  cite_group_delimiter=" + this.tmp.use_cite_group_delimiter + "\n  last_collapsed=" +last_collapsed + "\n  have_collapsed=" +this.tmp.have_collapsed + "\n  last_locator=" + last_locator)
+    if (undefined !== this.citation.opt["after-collapse-delimiter"]) {
+        if (last_locator) {
+            this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
+        } else if (last_collapsed && !this.tmp.have_collapsed) {
+            this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
+        } else if (!last_collapsed && !this.tmp.have_collapsed && this.citation.opt.collapse !== "year-suffix") {
+            this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
+        } else {
+            this.tmp.splice_delimiter = this.citation.opt.layout_delimiter;
+        }
+    } else if (this.tmp.use_cite_group_delimiter) {
+        this.tmp.splice_delimiter = this.citation.opt.cite_group_delimiter;
+    } else {
+        if (this.tmp.have_collapsed && this.opt.xclass === "in-text" && this.opt.update_mode !== CSL.NUMERIC) {
+            this.tmp.splice_delimiter = ", ";
+        } else if (this.tmp.cite_locales[pos - 1]) {
+            //
+            // Must have a value to take effect.  Use zero width space to force empty delimiter.
+            var alt_affixes = this.tmp.cite_affixes[this.tmp.area][this.tmp.cite_locales[pos - 1]];
+            if (alt_affixes && alt_affixes.delimiter) {
+                this.tmp.splice_delimiter = alt_affixes.delimiter;
+            }
+        } else if (!this.tmp.splice_delimiter) {
+            // This happens when no delimiter is set on cs:layout under cs:citation
+            this.tmp.splice_delimiter = "";
+        }
+    }
+
+/*
+    if (last_locator && "string" === typeof this.citation.opt["after-collapse-delimiter"]) {
+        this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
+    } else if (last_collapsed && !this.tmp.have_collapsed && "string" === typeof this.citation.opt["after-collapse-delimiter"]) {
+        this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
+    } else if (!last_collapsed && !this.tmp.have_collapsed && "string" === typeof this.citation.opt["after-collapse-delimiter"] && !this.citation.opt.collapse === "year-suffix") {
         this.tmp.splice_delimiter = this.citation.opt["after-collapse-delimiter"];
     } else if (this.tmp.use_cite_group_delimiter) {
         this.tmp.splice_delimiter = this.citation.opt.cite_group_delimiter;
@@ -892,6 +926,7 @@ CSL.getSpliceDelimiter = function (last_collapsed, pos) {
         // This happens when no delimiter is set on cs:layout under cs:citation
         this.tmp.splice_delimiter = "";
     }
+*/
     // Paranoia
     //if (!this.tmp.splice_delimiter) {
     //    this.tmp.splice_delimiter = "";
@@ -992,6 +1027,10 @@ CSL.getCitationCluster = function (inputList, citationID) {
         item = inputList[pos][1];
         item = CSL.parseLocator.call(this, item);
         last_collapsed = this.tmp.have_collapsed;
+        var last_locator = false;
+        if (pos > 0 && inputList[pos-1][1]) {
+            last_locator = !!inputList[pos-1][1].locator;
+        }
         params = {};
         
         // Reset shadow_numbers here, suppress reset in getCite()
@@ -1028,7 +1067,7 @@ CSL.getCitationCluster = function (inputList, citationID) {
         if (pos === (inputList.length - 1)) {
             this.parallel.ComposeSet();
         }
-        params.splice_delimiter = CSL.getSpliceDelimiter.call(this, last_collapsed, pos);
+        params.splice_delimiter = CSL.getSpliceDelimiter.call(this, last_locator, last_collapsed, pos);
         // XXX This appears to be superfluous.
         if (item && item["author-only"]) {
             this.tmp.suppress_decorations = true;
@@ -1206,17 +1245,6 @@ CSL.getCitationCluster = function (inputList, citationID) {
         if (buffer.length) {
             if ("string" === typeof buffer[0]) {
                 if (pos > 0) {
-                    // Awful. Should probably just not be using this.tmp.splice_delimiter at all.
-                    //print(JSON.stringify(myparams[pos-1], null, 2));
-                    //print(JSON.stringify(myparams[pos], null, 2));
-                    if (((myblobs.length-1) > pos && myparams[pos+1].have_collapsed) && !myparams[pos].have_collapsed) {
-                        //print(JSON.stringify(myparams[pos+1], null, 2));
-                        this.tmp.splice_delimiter = myparams[pos-1].splice_delimiter;
-                    }
-                    //print("pos="+pos)
-                    //print("objects.length="+objects.length)
-                    //print("myblobs.length="+myblobs.length)
-                    //buffer[0] = myparams[pos-1].splice_delimiter + buffer[0];
                     buffer[0] = txt_esc(this.tmp.splice_delimiter) + buffer[0];
                 }
             } else {
@@ -1317,6 +1345,7 @@ CSL.citeStart = function (Item, item, blockShadowNumberReset) {
     }
     this.tmp.lastchr = "";
     if (this.tmp.area === "citation" && this.citation.opt.collapse && this.citation.opt.collapse.length) {
+        //this.tmp.have_collapsed = "year";
         this.tmp.have_collapsed = true;
     } else {
         this.tmp.have_collapsed = false;
